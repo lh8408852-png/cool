@@ -1,0 +1,1151 @@
+
+--[[
+   Credits:
+   MelonScripter - Converted and aligned
+   Sadeecake - Creator
+   Emper - Reanimate
+   MyWorld - Optimization
+   
+   [FREE] Weapon: https://www.roblox.com/catalog/7168245078/Sledgehammer
+   [PAID] Weapon: https://www.roblox.com/catalog/15254947445/24k-Gold-Plunger
+
+   [FREE] Fedora Rig:
+   // https://www.roblox.com/catalog/3033910400/International-Fedora-Germany
+   // https://www.roblox.com/catalog/3409612660/International-Fedora-USA
+   // https://www.roblox.com/catalog/3398308134/International-Fedora-Canada
+   // https://www.roblox.com/catalog/3033908130/International-Fedora-France
+   // https://www.roblox.com/catalog/4819740796/Robox
+
+   [PAID] Grey Rig:
+   // https://www.roblox.com/catalog/80479688830908/Gray-Torso-Extension
+   // https://www.roblox.com/catalog/80401121980206/GREY-Right-Leg
+   // https://www.roblox.com/catalog/74603792617282/GREY-Left-Leg
+   // https://www.roblox.com/catalog/111809732325428/clover-left-arm
+   // https://www.roblox.com/catalog/94138150908378/green-clover
+  
+   [PAID] Classic Rig:
+   // https://www.roblox.com/catalog/12344545199/Extra-Left-hand-moving-Blocky-white
+   // https://www.roblox.com/catalog/12344591101/Extra-Right-hand-moving-Blocky-white
+   // https://www.roblox.com/catalog/13779879140/Black-Fluffy-Fur-Body
+   // https://www.roblox.com/catalog/11263254795/Dummy-Head-For-Headless
+   // https://www.roblox.com/catalog/11159410305/Rectangle-Head-For-Headless
+   
+   Socials:
+   // https://x.com/MelonScripter
+   // https://www.youtube.com/@MelonScripter
+]]
+ 
+game:GetService("StarterGui"):SetCore("SendNotification", { Title = "Melon's (FE) Converts/Scripts"; Text = "Thanks for using Emper Reanimate By Melon I Want It"; Icon = "rbxthumb://type=Asset&id=13446503788&w=150&h=150"})
+game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+
+function Reanimate()
+local OptionsAccessories = nil
+local OptionsRigTransparency = nil
+local OptionsRigR15 = nil
+local OptionsRigSetHumanoidDescription = nil
+local OptionsRigSetCharacter = nil
+local OptionsTeleportXandZoffset = nil
+local OptionsTeleportYoffset = nil
+local OptionsDisableScripts = nil
+local OptionsDisableScreenGUIs = nil
+local OptionsFlingEnabled = nil
+local OptionsFlingToolFling = nil
+local OptionsFlingTimeout = nil
+local OptionsFlingVelocity = nil
+local OptionsFlingHighlightTargets = nil
+
+local BindableEvent = nil
+local Boolean = false
+local Humanoid = nil
+local Rig = nil
+local RigHumanoid = nil
+local RigHumanoidRootPart = nil
+local Success = false
+local Time = nil
+local DeltaTime = nil
+local LastTime = nil
+
+local Attachments = { }
+local BaseParts = { }
+local Blacklist = { }
+local Enableds = { }
+local Handles = { }
+local Highlights = { }
+local RBXScriptConnections = { }
+local RigAccessories = { }
+local Tables = { }
+local Targets = { }
+
+local CFrame = CFrame
+local CFrameAngles = CFrame.Angles
+local CFrameidentity = CFrame.identity
+local CFramenew = CFrame.new
+
+local coroutine = coroutine
+local coroutinecreate = coroutine.create
+local coroutineclose = coroutine.close
+local coroutineresume = coroutine.resume
+
+local Enum = Enum
+local HumanoidStateType = Enum.HumanoidStateType
+local Physics = HumanoidStateType.Physics
+local Running = HumanoidStateType.Running
+local Track = Enum.CameraType.Track
+local UserInputType = Enum.UserInputType
+local MouseButton1 = UserInputType.MouseButton1
+local Touch = UserInputType.Touch
+
+local game = game
+local Clone = game.Clone
+local Destroy = game.Destroy
+local FindFirstAncestorOfClass = game.FindFirstAncestorOfClass
+local FindFirstChildOfClass = game.FindFirstChildOfClass
+local GetPropertyChangedSignal = game.GetPropertyChangedSignal
+local GetChildren = game.GetChildren
+local GetDescendants = game.GetDescendants
+local IsA = game.IsA
+local Players = FindFirstChildOfClass(game, "Players")
+local CreateHumanoidModelFromUserId = Players.CreateHumanoidModelFromUserId
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local RunService = FindFirstChildOfClass(game, "RunService")
+local PostSimulation = RunService.PostSimulation
+local PreRender = RunService.PreRender
+local PreSimulation = RunService.PreSimulation
+local Connect = PostSimulation.Connect
+local Disconnect = Connect(GetPropertyChangedSignal(game, "Parent"), function() end).Disconnect
+local Wait = PostSimulation.Wait
+local StarterGui = FindFirstChildOfClass(game, "StarterGui")
+local SetCore = StarterGui.SetCore
+local UserInputService = FindFirstChildOfClass(game, "UserInputService")
+local IsMouseButtonPressed = UserInputService.IsMouseButtonPressed
+local Workspace = FindFirstChildOfClass(game, "Workspace")
+local CurrentCamera = Workspace.CurrentCamera
+
+local Instancenew = Instance.new
+local Humanoid = Instancenew("Humanoid")
+local ApplyDescription = Humanoid.ApplyDescription
+local ChangeState = Humanoid.ChangeState
+local GetAppliedDescription = Humanoid.GetAppliedDescription
+local Move = Humanoid.Move
+Destroy(Humanoid)
+local Part = Instancenew("Part")
+local GetJoints = Part.GetJoints
+Destroy(Part)
+
+local math = math
+local mathabs = math.abs
+local mathrandom = math.random
+local mathsin = math.sin
+
+local osclock = os.clock
+
+local pairs = pairs
+local pcall = pcall
+
+local script = script
+
+local string = string
+local stringchar = string.char
+local stringfind = string.find
+local stringrep = string.rep
+
+local table = table
+local tableclear = table.clear
+local tablefind = table.find
+local tableinsert = table.insert
+local tableremove = table.remove
+
+local task = task
+local taskdefer = task.defer
+local taskdelay = task.delay
+local taskspawn = task.spawn
+local taskwait = task.wait
+
+local sethiddenproperty = sethiddenproperty or function() end
+
+local type = type
+local typeof = typeof
+
+local Vector3 = Vector3
+local Vector3new = Vector3.new
+local Vector3yAxis = Vector3.yAxis
+local Vector3zero = Vector3.zero
+
+local CameraCFrame = CFrameidentity
+
+local LimbSize = Vector3new(1, 2, 1)
+local TorsoSize = Vector3new(2, 2, 1)
+
+local function BreakJoints(Parent)
+for _, Instance in pairs(GetDescendants(Parent)) do
+if IsA(Instance, "JointInstance") then
+Destroy(Instance)
+end
+end
+end
+
+local function CameraSubject()
+CurrentCamera.CameraSubject = RigHumanoid
+Wait(PreRender)
+CurrentCamera.CFrame = CameraCFrame
+end
+
+local function CameraType()
+if CurrentCamera.CameraType ~= Track then
+CurrentCamera.CameraType = Track
+end
+end
+
+local function Camera()
+local Camera = Workspace.CurrentCamera
+
+if Camera then
+CameraCFrame = Camera.CFrame
+CurrentCamera = Camera
+
+CameraSubject()
+CameraType()
+
+tableinsert(RBXScriptConnections, Connect(GetPropertyChangedSignal(Camera, "CameraSubject"), CameraSubject))
+tableinsert(RBXScriptConnections, Connect(GetPropertyChangedSignal(Camera, "CameraType"), CameraType))
+end
+end
+
+local function FindFirstChildOfClassAndName(Parent, ClassName, Name)
+for Index, Instance in pairs(GetChildren(Parent)) do
+if IsA(Instance, ClassName) and Instance.Name == Name then
+return Instance
+end
+end
+end
+
+local function WaitForChildOfClassAndName(Parent, ...)
+local Instance = FindFirstChildOfClassAndName(Parent, ...)
+
+while not Instance and typeof(Parent) == "Instance" do
+Instance = FindFirstChildOfClassAndName(Parent, ...)
+Wait(Parent.ChildAdded)
+end
+
+return Instance
+end
+
+local function Invisible(Instance)
+if IsA(Instance, "BasePart") or IsA(Instance, "Decal") then
+Instance.Transparency = OptionsRigTransparency
+elseif IsA(Instance, "ForceField") or IsA(Instance, "Explosion") then
+Instance.Visible = false
+elseif IsA(Instance, "ParticleEmitter") or IsA(Instance, "Fire") or IsA(Instance, "Sparkles") then
+Instance.Enabled = false
+end
+end
+
+local function DescendantAdded(Instance)
+if IsA(Instance, "Attachment") then
+local Handle = Instance.Parent
+
+if IsA(Handle, "BasePart") then
+local AttachmentsAttachment = Attachments[Instance.Name]
+
+if AttachmentsAttachment then
+local MeshId = ""
+local TextureId = ""
+
+if IsA(Handle, "MeshPart") then
+MeshId = Handle.MeshId
+TextureId = Handle.TextureID
+else
+local SpecialMesh = FindFirstChildOfClass(Handle, "SpecialMesh")
+
+if SpecialMesh then
+MeshId = SpecialMesh.MeshId
+TextureId = SpecialMesh.TextureId
+end
+end
+
+for Index, Table in pairs(OptionsAccessories) do
+if stringfind(MeshId, Table.MeshId or "") and stringfind(TextureId, Table.TextureId or "") then
+local Instance = FindFirstChildOfClassAndName(Rig, "BasePart", Table.Name)
+
+local AlternativeName = Table.AlternativeName
+local AlternativeInstance = false
+
+if not Instance and AlternativeName then
+Instance = FindFirstChildOfClassAndName(Rig, "BasePart", AlternativeName)
+AlternativeInstance = true
+end
+
+if Instance and not tablefind(Blacklist, Instance) then
+if Table.Blacklist then
+tableinsert(Blacklist, Instance)
+end
+BreakJoints(Handle)
+tableinsert(Tables, { Part0 = Handle, Part1 = Instance, CFrame = AlternativeInstance and Table.AllowAlternativeCFrame and Table.AlternativeCFrame or Table.CoordinateFrame, LastPosition = Instance.Position })
+return
+end
+end
+end
+for Index, Table in pairs(RigAccessories) do
+local TableHandle = Table.Handle
+
+if typeof(TableHandle) == "Instance" and Table.MeshId == MeshId and Table.TextureId == TextureId then
+BreakJoints(Handle)
+tableinsert(Tables, { Part0 = Handle, Part1 = TableHandle, LastPosition = TableHandle.Position })
+return
+end
+end
+
+local Accessory = Handle.Parent
+
+if IsA(Accessory, "Accessory") then
+local AccessoryClone = Instancenew("Accessory")
+AccessoryClone.Name = Accessory.Name
+
+local HandleClone = Clone(Handle)
+Invisible(HandleClone)
+BreakJoints(HandleClone)
+HandleClone.Parent = AccessoryClone
+
+local Weld = Instancenew("Weld")
+Weld.Name = "AccessoryWeld"
+Weld.C0 = Instance.CFrame
+Weld.C1 = AttachmentsAttachment.CFrame
+Weld.Part0 = HandleClone
+Weld.Part1 = AttachmentsAttachment.Parent
+Weld.Parent = HandleClone
+
+tableinsert(RigAccessories, { Handle = HandleClone, MeshId = MeshId, TextureId = TextureId })
+tableinsert(Tables, { Part0 = Handle, Part1 = HandleClone, LastPosition = HandleClone.Position })
+
+AccessoryClone.Parent = Rig
+end
+end
+end
+elseif IsA(Instance, "BasePart") then
+Instance.CanQuery = false
+tableinsert(BaseParts, Instance)
+end
+end
+
+local function ApplyDescriptionRig()
+local Description = GetAppliedDescription(Humanoid)
+Description.HatAccessory = ""
+Description.BackAccessory = ""
+Description.FaceAccessory = ""
+Description.HairAccessory = ""
+Description.NeckAccessory = ""
+Description.FrontAccessory = ""
+Description.WaistAccessory = ""
+Description.ShouldersAccessory = ""
+ApplyDescription(RigHumanoid, Description)
+
+for Index, Instance in pairs(GetDescendants(Rig)) do
+Invisible(Instance)
+end
+end
+
+local function SetCharacter()
+taskwait()
+LocalPlayer.Character = Rig
+end
+
+local Tools = { }
+
+local function CharacterAdded()
+local Character = LocalPlayer.Character
+if Character and Character ~= Rig then
+if OptionsFlingToolFling then
+for Index, Backpack in pairs(GetChildren(LocalPlayer)) do
+if IsA(Backpack, "Backpack") then
+for Index, Instance in pairs(GetChildren(Backpack)) do
+if IsA(Instance, "Tool") then
+Tools[Instance] = FindFirstChildOfClassAndName(Instance, "BasePart", "Handle")	
+Instance.Parent = Character
+end
+end
+end
+end
+end
+
+if OptionsRigSetCharacter then
+taskspawn(SetCharacter)
+end
+
+tableclear(BaseParts)
+tableclear(Blacklist)
+tableclear(Tables)
+
+if CurrentCamera then
+CameraCFrame = CurrentCamera.CFrame
+end
+
+for Index, Instance in pairs(GetDescendants(Character)) do
+DescendantAdded(Instance)
+end
+
+tableinsert(RBXScriptConnections, Connect(Character.DescendantAdded, DescendantAdded))
+
+Humanoid = WaitForChildOfClassAndName(Character, "Humanoid", "Humanoid")
+local HumanoidRootPart = WaitForChildOfClassAndName(Character, "BasePart", "HumanoidRootPart")
+
+if Boolean then
+Camera()
+
+if HumanoidRootPart then
+RigHumanoidRootPart.CFrame = HumanoidRootPart.CFrame
+Boolean = false
+end
+
+if OptionsRigSetHumanoidDescription and RigHumanoid and Humanoid then
+pcall(ApplyDescriptionRig)
+end
+end
+
+if HumanoidRootPart then
+for Index, Table in pairs(Targets) do
+if not HumanoidRootPart then
+break
+end
+
+if Humanoid then
+ChangeState(Humanoid, Physics)
+end
+
+local Target = Table.Target
+
+local Timeout = Time + OptionsFlingTimeout
+local LastPosition = Target.Position
+
+while Target and HumanoidRootPart do
+if Time > Timeout then
+break
+end
+
+local Position = Target.Position
+local LinearVelocity = ( Position - LastPosition ) / DeltaTime
+
+if LinearVelocity.Magnitude > 50 then
+break
+end
+
+LastPosition = Position
+
+HumanoidRootPart.AssemblyAngularVelocity = OptionsFlingVelocity
+HumanoidRootPart.AssemblyLinearVelocity = OptionsFlingVelocity
+
+HumanoidRootPart.CFrame = Target.CFrame * CFramenew(0, 0, 4 * mathsin(Time * 30)) * CFrameAngles(mathrandom(- 360, 360), mathrandom(- 360, 360), mathrandom(- 360, 360)) + ( LinearVelocity * 0.5) 
+taskwait()
+end
+
+local Highlight = Table.Highlight
+
+if Highlight then
+Destroy(Highlight)
+end
+
+Targets[Index] = nil
+end
+
+if Humanoid then
+ChangeState(Humanoid, Running)
+end
+
+if RigHumanoidRootPart then
+HumanoidRootPart.AssemblyAngularVelocity = Vector3zero
+HumanoidRootPart.AssemblyLinearVelocity = Vector3zero
+
+HumanoidRootPart.CFrame = RigHumanoidRootPart.CFrame + Vector3new(mathrandom(- OptionsTeleportXandZoffset, OptionsTeleportXandZoffset), OptionsTeleportYoffset, mathrandom(- OptionsTeleportXandZoffset, OptionsTeleportXandZoffset))
+end
+end
+
+taskwait(0.22 + Wait(PreSimulation))
+if Character then
+BreakJoints(Character)
+end
+end
+end
+
+local function PostSimulationConnect()
+sethiddenproperty(LocalPlayer, "SimulationRadius", 2147483647)
+
+Time = osclock()
+DeltaTime = Time - LastTime
+LastTime = Time
+
+local Integer = 29 + mathsin(Time)
+local Vector3 = Vector3new(0, 0, 0.002 * mathsin(Time * 25))
+
+for Index, Table in pairs(Tables) do
+local Part0 = Table.Part0
+local Part1 = Table.Part1
+
+if Part0 and # GetJoints(Part0) == 0 and Part0.ReceiveAge == 0 and Part1 then
+Part0.AssemblyAngularVelocity = Vector3zero
+
+local Position = Part1.Position
+local LinearVelocity = ( ( Table.LastPosition - Position ) / DeltaTime ) * Integer
+Table.LastPosition = Position
+
+Part0.AssemblyLinearVelocity = Vector3new(LinearVelocity.X, Integer, LinearVelocity.Z)
+
+Part0.CFrame = Part1.CFrame * ( Table.CFrame or CFrameidentity ) + Vector3
+end
+end
+
+local Hit = Mouse.Hit
+local Holding = IsMouseButtonPressed(UserInputService, MouseButton1)
+
+for Tool, BasePart in pairs(Tools) do
+if BasePart.ReceiveAge == 0 and # GetJoints(BasePart) == 0 then
+BasePart.CanCollide = false
+BasePart.AssemblyAngularVelocity = OptionsFlingVelocity
+BasePart.AssemblyLinearVelocity = OptionsFlingVelocity
+
+if Holding then
+BasePart.CFrame = Hit
+elseif RigHumanoidRootPart then
+BasePart.CFrame = RigHumanoidRootPart.CFrame * CFramenew(0, OptionsTeleportYoffset, 0) * CFrameAngles(mathrandom(- 360, 360), mathrandom(- 360, 360), mathrandom(- 360, 360))
+else
+BasePart.CFrame = CFrameidentity
+end
+end
+end
+
+if RigHumanoid and Humanoid then
+RigHumanoid.Jump = Humanoid.Jump
+Move(RigHumanoid, Humanoid.MoveDirection)
+end
+
+if not Success then
+Success = pcall(SetCore, StarterGui, "ResetButtonCallback", BindableEvent)
+else
+SetCore(StarterGui, "ResetButtonCallback", BindableEvent)
+end
+end
+
+local function PreSimulationConnect()
+for Index, BasePart in pairs(BaseParts) do
+BasePart.CanCollide = false
+end
+end
+
+local function Fling(Target)
+if typeof(Target) == "Instance" then
+if IsA(Target, "Humanoid") then
+Target = Target.Parent
+end
+if IsA(Target.Parent, "Accessory") then
+Target = FindFirstAncestorOfClass(Target, "Model")
+end
+if IsA(Target, "Model") then
+Target = FindFirstChildOfClassAndName(Target, "BasePart", "HumanoidRootPart")
+end
+if IsA(Target, "BasePart") then
+for Index, Table in pairs(Targets) do
+if Table.Target == Target then
+return
+end
+end
+
+local Parent = Target.Parent
+
+local Highlight = nil
+
+if OptionsFlingHighlightTargets then
+Highlight = Instancenew("Highlight")
+Highlight.Adornee = Parent
+Highlight.Parent = Parent
+tableinsert(Highlights, Highlight)
+end
+
+tableinsert(Targets, {Highlight = Highlight, Target = Target})
+end
+end
+end
+
+local function InputBegan(InputObject)
+local UserInputType = InputObject.UserInputType
+
+if UserInputType == MouseButton1 or UserInputType == Touch then
+local Target = Mouse.Target
+
+if Target and not Target.Anchored then
+local Model = Target.Parent
+
+if IsA(Model, "Model") and FindFirstChildOfClass(Model, "Humanoid") then
+local HumanoidRootPart = FindFirstChildOfClassAndName(Model, "BasePart", "HumanoidRootPart")
+
+if HumanoidRootPart then
+Fling(HumanoidRootPart)
+end
+else
+Fling(Target)
+end
+end
+end
+end
+
+local function gameDescendantAdded(Instance)
+if ( OptionsDisableScreenGUIs and IsA(Instance, "ScreenGui") ) or ( OptionsDisableScripts and Instance ~= script and ( IsA(Instance, "LocalScript") or IsA(Instance, "Script") ) ) then
+Enableds[Instance] = Instance.Enabled
+Instance.Enabled = false
+
+tableinsert(RBXScriptConnections, Connect(GetPropertyChangedSignal(Instance, "Enabled"), function()
+Enableds[Instance] = Instance.Enabled
+Instance.Enabled = false
+end))
+end
+end
+
+local function Stop()
+for Index, RBXScriptConnection in pairs(RBXScriptConnections) do
+Disconnect(RBXScriptConnection)
+end
+for Index, Highlight in pairs(Highlights) do
+Destroy(Highlight)
+end
+for Instance, Boolean in pairs(Enableds) do
+Instance.Enabled = Boolean
+end
+
+tableclear(Attachments)
+tableclear(BaseParts)
+tableclear(Enableds)
+tableclear(Handles)
+tableclear(Highlights)
+tableclear(RBXScriptConnections)
+tableclear(Tables)
+tableclear(Targets)
+
+if Rig then
+Destroy(Rig)
+end
+
+Destroy(BindableEvent)
+SetCore(StarterGui, "ResetButtonCallback", true)
+end
+
+local Emperean = {
+Stop = Stop,
+Start = function(Options)
+Options = Options or { }
+OptionsAccessories = Options.Accessories or {}
+local OptionsRig = Options.Rig
+OptionsRigTransparency = OptionsRig.Transparency
+OptionsRigR15 = OptionsRig.R15
+OptionsRigSetHumanoidDescription = OptionsRig.SetHumanoidDescription
+OptionsRigSetCharacter = OptionsRig.SetCharacter
+local OptionsTeleport = Options.Teleport or {}
+local XandYoffset = OptionsTeleport.XandYoffset
+OptionsTeleportXandZoffset = XandYoffset and mathabs(XandYoffset) or 6
+OptionsTeleportYoffset = OptionsTeleport.Yoffset or 0
+local OptionsDisable = Options.Disable
+OptionsDisableScripts = OptionsDisable.Scripts
+OptionsDisableScreenGUIs = OptionsDisable.GUIs
+local OptionsFling = Options.Fling or {}
+OptionsFlingEnabled = OptionsFling.Enabled
+OptionsFlingToolFling = OptionsFling.ToolFling
+OptionsFlingTimeout = OptionsFling.Timeout or 1.5
+OptionsFlingVelocity = OptionsFling.Velocity or Vector3new(0, 4096, 0)
+OptionsFlingHighlightTargets = OptionsFling.HighlightTargets
+
+if OptionsDisableScripts or OptionsDisableScreenGUIs then
+for Index, Instance in pairs(GetDescendants(game)) do
+gameDescendantAdded(Instance)
+end
+
+tableinsert(RBXScriptConnections, Connect(game.DescendantAdded, gameDescendantAdded))
+end
+
+Boolean = true
+LastTime = osclock()
+
+Rig = OptionsRigR15 and CreateHumanoidModelFromUserId(Players, 5532894300) or CreateHumanoidModelFromUserId(Players, 5532891747)
+Rig.Name = "G59"
+
+local Hammer = Instance.new("Part", Rig)
+Hammer.Name = "Hammer"
+Hammer.Transparency = 1
+Hammer.CanCollide = false
+
+RigHumanoid = Rig.Humanoid
+RigHumanoidRootPart = Rig.HumanoidRootPart
+Rig.Parent = Workspace
+
+for Index, Instance in pairs(GetDescendants(Rig)) do
+if IsA(Instance, "Attachment") then
+Attachments[Instance.Name] = Instance
+else
+Invisible(Instance)
+end
+end
+
+BindableEvent = Instancenew("BindableEvent")
+Connect(BindableEvent.Event, Stop)
+
+tableinsert(RBXScriptConnections, Connect(GetPropertyChangedSignal(Workspace, "CurrentCamera"), Camera))
+
+CharacterAdded()
+tableinsert(RBXScriptConnections, Connect(GetPropertyChangedSignal(LocalPlayer, "Character"), CharacterAdded))
+
+if OptionsFlingEnabled then
+tableinsert(RBXScriptConnections, Connect(UserInputService.InputBegan, InputBegan))
+end
+
+tableinsert(RBXScriptConnections, Connect(PreSimulation, PreSimulationConnect))
+tableinsert(RBXScriptConnections, Connect(PostSimulation, PostSimulationConnect))
+
+return { 
+Rig = Rig,
+Options = Options,
+Fling = Fling,
+},
+taskwait()
+end,
+}
+
+Emperean.Start({
+Accessories = {
+-- Free Rig
+{ Blacklist = true, Name = "Torso", AlternativeName = "UpperTorso", MeshId = "4819720316", TextureId = "4819722776", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, -0.25), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "3030546036", TextureId = "3033903209", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(-1.57, 0, -1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "3030546036", TextureId = "3360978739", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(-1.57, 0, 1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Leg", AlternativeName = "RightLowerLeg", MeshId = "3030546036", TextureId = "3033898741", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(-1.57, 0, -1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Leg", AlternativeName = "LeftLowerLeg", MeshId = "3030546036", TextureId = "3409604993", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(-1.57, 0, 1.57), AlternativeCFrame = CFrameidentity },
+
+-- Cheap Paid Rig
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "12344206657", TextureId = "12344206675", AllowAlternativeCFrame = false, CoordinateFrame = CFramenew(-0.095, 0, 0) * CFrameAngles(- 2, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "12344207333", TextureId = "12344207341", AllowAlternativeCFrame = false, CoordinateFrame = CFramenew(0.095, 0, 0) * CFrameAngles(- 2, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Leg", AlternativeName = "RightLowerLeg", MeshId = "11263221350", TextureId = "11263219250", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(1.57, - 1.57, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Leg", AlternativeName = "LeftLowerLeg", MeshId = "11159370334", TextureId = "11159284657", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(1.57, 1.57, 0), AlternativeCFrame = CFrameidentity },
+
+-- Mesh Rig
+{ Blacklist = true, Name = "Torso", AlternativeName = "UpperTorso", MeshId = "127552124837034", TextureId = "131014325980101", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "121304376791439", TextureId = "131014325980101", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "117287001096396", TextureId = "120169691545791", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },    
+{ Blacklist = true, Name = "Right Leg", AlternativeName = "RightLowerLeg", MeshId = "121304376791439", TextureId = "131014325980101", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Leg", AlternativeName = "LeftLowerLeg", MeshId = "117287001096396", TextureId = "120169691545791", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },
+
+-- (OLD) Noob Rig
+{ Blacklist = true, Name = "Torso", AlternativeName = "UpperTorso", MeshId = "18640899369", TextureId = "18640899481", AllowAlternativeCFrame = false, CoordinateFrame = CFrameidentity, AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "18640914129", TextureId = "18640914168", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "18640914129", TextureId = "18640914168", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 0), AlternativeCFrame = CFrameidentity },    
+{ Blacklist = true, Name = "Right Leg", AlternativeName = "RightLowerLeg", MeshId = "18640901641", TextureId = "18640901676", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Leg", AlternativeName = "LeftLowerLeg", MeshId = "18640901641", TextureId = "18640901676", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 0), AlternativeCFrame = CFrameidentity },
+
+-- (OLD) Accurate Paid Rig
+{ Blacklist = true, Name = "Torso", AlternativeName = "UpperTorso", MeshId = "14241018198", TextureId = "14251599953", AllowAlternativeCFrame = false, CoordinateFrame = CFrameidentity, AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "17374767929", TextureId = "17374768001", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "17374767929", TextureId = "17374768001", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },	
+{ Blacklist = true, Name = "Right Leg", AlternativeName = "RightLowerLeg", MeshId = "17387586286", TextureId = "17387586304", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Leg", AlternativeName = "LeftLowerLeg", MeshId = "17387586286", TextureId = "17387586304", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },
+
+-- (OLD) White arms below
+{ Blacklist = true, Name = "Right Arm", AlternativeName = "RightLowerArm", MeshId = "14255522247", TextureId = "14255543546", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Left Arm", AlternativeName = "LeftLowerArm", MeshId = "14255522247", TextureId = "14255543546", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 1.57, 1.57), AlternativeCFrame = CFrameidentity },
+
+-- TEMP
+{ Blacklist = true, Name = "Hammer", AlternativeName = "Hammer", MeshId = "7126210268", TextureId = "7126290888", AllowAlternativeCFrame = false, CoordinateFrame = CFrameAngles(0, 0, 0), AlternativeCFrame = CFrameidentity },
+{ Blacklist = true, Name = "Hammer", AlternativeName = "Hammer", MeshId = "15172160708", TextureId = "15172162617", AllowAlternativeCFrame = false, CoordinateFrame = CFramenew(0, 0.45, 0) * CFrameAngles(0.15, 0, 0.90), AlternativeCFrame = CFrameidentity },
+
+},
+Rig = {
+Transparency = 1,
+R15 = false,
+SetHumanoidDescription = true,
+SetCharacter = false
+},
+Teleport = {
+XandZoffset = 0,
+Yoffset = -50
+},
+Disable = {
+Scripts = true,
+ScreenGUIs = false
+},
+Fling = {
+Enabled = true,
+ToolFling = false,
+Timeout = 0.45,
+Velocity = Vector3new(15250, 16250, 15250),
+HighlightTargets = true
+}
+})
+end
+
+Reanimate()
+
+-- -gh 80479688830908, 80401121980206, 74603792617282, 111809732325428, 94138150908378
+
+task.wait(0.25)
+
+local math=setmetatable({random=function(Arg1,Arg2,DIV) DIV=DIV or 1 return math.random(Arg1*DIV,Arg2*DIV)/DIV end,CosSin=function(Arg) return (math.sin(Arg/2)*math.cos(Arg/2)) end,},{__index=math,})
+local CFrame=setmetatable({Angles=function(Arg1,Arg2,Arg3,Angles) if not Angles then return CFrame.Angles(Arg1,Arg2,Arg3) else return CFrame.Angles(math.rad(Arg1),math.rad(Arg2),math.rad(Arg3)) end end,},{__index=CFrame,})
+local Instance=setmetatable({new=function(type,args) local instance=Instance.new(type) if args then if string.lower(typeof(args)) == "instance" then instance.Parent=args elseif string.lower(typeof(args))=="table" then for i,v in pairs(args) do pcall(function() instance[i]=v end) end end end return instance end,Remove=function(Instance_,Time) if string.lower(typeof(Instance_))=="instance" then game:GetService("Debris"):AddItem(Instance_,Time or 0) elseif string.lower(typeof(Instance_))=="table" then table.foreach(Instance_,function(_,v) game:GetService("Debris"):AddItem(v,Time or 0) end) end end},{__index=Instance,})
+Player = game:GetService("Players").LocalPlayer
+Mouse = Player:GetMouse()
+
+--// Shortcuts
+local ins=Instance.new
+local v3=Vector3.new
+local v2=Vector2.new
+local cf=CFrame.new
+local angles=CFrame.Angles
+local ud=UDim.new
+local ud2=UDim2.new
+local c3=Color3.new
+local rgb=Color3.fromRGB
+local hsv=Color3.fromHSV
+local bc=BrickColor.new
+local bcRandom=BrickColor.Random
+local palette=BrickColor.palette
+local cs=ColorSequence.new
+local ns=NumberSequence.new
+local nsk=NumberSequenceKeypoint.new
+local nr=NumberRange.new
+local random=math.random
+local rad=math.rad
+local sin=math.sin
+local cos=math.cos
+local tan=math.tan
+local cotan=math.CosSin
+local floor=math.floor
+local pi=math.floor
+local abs=math.abs
+local sqrt=math.sqrt
+local clamp=math.clamp
+local ray=Ray.new
+local huge=math.huge
+--// Basic functions
+function Tween(Object,Args,Info)
+if Object and Args then
+Info = Info or TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.In,0,false,0)
+if typeof(Info) == "table" then Info = TweenInfo.new(unpack(Info)) end
+game:GetService("TweenService"):Create(Object,Info,Args):Play()
+end
+end
+function Sound(Id,Volume,Pitch,Parent,MaxDistance,EmitterSize,Looped)
+local S=ins("Sound",{Volume=Volume or 1,Pitch=Pitch or 1,MaxDistance=MaxDistance or 500,EmitterSize=EmitterSize or 5,Looped=Looped or false,SoundId="rbxassetid://"..Id,Parent=Parent})
+S:Play()
+coroutine.wrap(function()
+if S.Looped then return end
+if S.IsLoaded then
+Instance.Remove(S,S.TimeLength/S.Pitch)
+else
+S.Loaded:Connect(function()
+Instance.Remove(S,S.TimeLength/S.Pitch)
+end)
+end
+end)()
+return S
+end
+function Raycast(Origin,Direction,Blacklist,MaxDistance,IgnoreWater)
+return workspace:FindPartOnRayWithIgnoreList(ray(Origin,Direction.Unit*MaxDistance),Blacklist or {},false,IgnoreWater)
+end
+--// Setup 1
+for i,v in pairs(Workspace:GetDescendants()) do
+if (v.Name=="Animate" and v:IsA("LocalScript")) or v:IsA("Animator") then
+Instance.Remove(v)
+end
+end
+--// Character indexing
+local LockWS,LockJP=false,false
+local Type="R6"
+Char,char=workspace["G59"],workspace["G59"]
+local Hum,hum=Char:FindFirstChildOfClass("Humanoid"),Char:FindFirstChildOfClass("Humanoid")
+local hrp,HRP=Char.HumanoidRootPart,Char.HumanoidRootPart
+local h,t,rs,ls,rl,ll
+local nec,rs,ls,rh,lh,rutj
+local necC0,necC1=cf(),cf()
+local rutjC0,rutjC1=cf(),cf()
+local rsC0,rsC1=cf(),cf()
+local lsC0,lsC1=cf(),cf()
+local rhC0,rhC1=cf(),cf()
+local lhC0,lhC1=cf(),cf()
+local h,ut,lt,rua,rla,rh,lua,lla,lh,ral,rll,rf,lul,lll,lf
+local CFs={}
+local Joints={}
+if Type=="R6" then
+h,t,ra,la,rl,ll=char.Head,char.Torso,char["Right Arm"],char["Left Arm"],char["Right Leg"],char["Left Leg"]
+nec,rutj,rs,ls,rh,lh=t.Neck,hrp.RootJoint,t["Right Shoulder"],t["Left Shoulder"],t["Right Hip"],t["Left Hip"]
+necC0,necC1=cf(0,t.Size.Y/2,0),cf(0,-h.Size.Y/2,0)
+rutjC0,rutjC1=cf(0,0,0),cf(0,0,0)
+rsC0,rsC1=cf(t.Size.X/2,t.Size.Y/4,0),cf(-ra.Size.X/2,ra.Size.Y/4,0)
+lsC0,lsC1=cf(-t.Size.X/2,t.Size.Y/4,0),cf(la.Size.X/2,la.Size.Y/4,0)
+rhC0,rhC1=cf(t.Size.X/4,-t.Size.Y/2,0),cf(0,rl.Size.Y/2,0)
+lhC0,lhC1=cf(-t.Size.X/4,-t.Size.Y/2,0),cf(0,ll.Size.Y/2,0)
+Instance.Remove({nec,rutj,rs,ls,rh,lh})
+nec=ins("Motor6D",{Name="Neck",Part0=t,Part1=h,C0=necC0,C1=necC1,Parent=t,})
+rutj=ins("Motor6D",{Name="RootJoint",Part0=hrp,Part1=t,C0=rutjC0,C1=rutjC1,Parent=hrp,})
+rs=ins("Motor6D",{Name="Right Shoulder",Part0=t,Part1=ra,C0=rsC0,C1=rsC1,Parent=t,})
+ls=ins("Motor6D",{Name="Left Shoulder",Part0=t,Part1=la,C0=lsC0,C1=lsC1,Parent=t,})
+rh=ins("Motor6D",{Name="Right Hip",Part0=t,Part1=rl,C0=rhC0,C1=rhC1,Parent=t,})
+lh=ins("Motor6D",{Name="Left Hip",Part0=t,Part1=ll,C0=lhC0,C1=lhC1,Parent=t,})
+elseif Type=="R15" then
+h,hrp=Char.Head,Char.HumanoidRootPart
+ut,lt=Char.UpperTorso,Char.LowerTorso
+rua,rla,rh=Char.RightUpperArm,Char.RightLowerArm,Char.RightHand
+lua,lla,lh=Char.LeftUpperArm,Char.LeftLowerArm,Char.LeftHand
+rul,rll,rf=Char.RightUpperLeg,Char.RightLowerLeg,Char.RightFoot
+lul,lll,lf=Char.LeftUpperLeg,Char.LeftLowerLeg,Char.LeftFoot
+for i,v in pairs(Char:GetDescendants()) do
+if v:IsA("Motor6D") then
+local CFData={C0=cf(v.C0.Position),C1=cf(v.C1.Position),Part0=v.Part0,Part1=v.Part1,Parent=v.Parent}
+local Joint=ins("Motor6D",{C0=CFData.C0,C1=CFData.C1,Part0=CFData.Part0,Part1=CFData.Part1,Name=v.Name,Parent=CFData.Parent,})
+CFs[v.Name]=CFData
+Joints[v.Name]=setmetatable({Object=Joint,Link=CFData,Remove=function(Time) Instance.Remove(Joint,Time) end},{__index=Joint,__newindex=function(self,k,v) Joint[k]=v end})
+v.Parent=nil
+Instance.Remove(v)
+end
+end
+end
+--// Variables
+local Using,Muted,Holding=false,true,false
+local Sine=0
+local Change=1
+local TimePos
+local WS,JP=16,50
+local MPos,BloodTrans=1,1
+local LastTick,LastHitTick=tick(),tick()
+local Step="R"
+local StepSounds={Glass=4085889170,Plastic=2812418291,SmoothPlastic=2812418291,Neon=2812418291,ForceField=2812418291,Metal=2812417769,DiamondPlate=2812417769,CorrodedMetal=2812417769,Foil=2812417769,Sand=4085867669,Grass=619188333,Slate=2812418291,Concrete=2812418291,Granite=2812418291,Pebble=2812418291,Marble=2812418291,Cobblestone=2812418291,Brick=2812418291,Water=1110489303,Wood=2812419402,WoodPlanks=2812419402,Fabric=133705377,Snow=619083295}
+local HitSounds={Metal=295837588,Foil=295837588,CorrodedMetal=295837588,DiamondPlate=295837588,Slate={3744400428,3744401196,3744400845},Concrete={3744400428,3744401196,3744400845},Granite={3744400428,3744401196,3744400845},Pebble={3744400428,3744401196,3744400845},Marble={3744400428,3744401196,3744400845},Cobblestone={3744400428,3744401196,3744400845},Brick={3744400428,3744401196,3744400845},Grass=1055286841,Fabric=1055286841,Glass=144884907,Plastic={3744398212,3748241006,3744397949,3744397627},SmoothPlastic={3744398212,3748241006,3744397949,3744397627},Neon={3744398212,3748241006,3744397949,3744397627},ForceField=4458751694,Wood={3744398212,3748241006,3744397949,3744397627},WoodPlanks={3744398212,3748241006,3744397949,3744397627}}
+local Music={2938166578,3751170296,1534958855,190571813,173987372}
+-- local BN,Anims,Ragdoll,Blood=require(script.Data.Scripts.Modules.BoxNegation),require(script.Data.Scripts.Modules.Animations),require(script.Data.Scripts.Modules.Ragdoll),require(script.Data.Scripts.Modules.Blood)
+
+
+local Ignore={char,BLOODPARENT}
+local Poses={
+{
+angles(math.rad(-15),math.rad(-20),math.rad(0)),
+cf(0.05,-.075,-0.1)*angles(math.rad(-2.5),math.rad(0),math.rad(-2.5)),
+cf(-0.1,-0.1,0)*angles(math.rad(3.5),math.rad(5),math.rad(2.5)),
+cf(0,-0.25,0.5)*angles(math.rad(40),math.rad(-50),math.rad(25)),
+cf(0.1,0.1,-0.2)*angles(math.rad(-5),math.rad(-30),math.rad(0)),
+cf(0,0,0)*angles(math.rad(0),math.rad(2.5),math.rad(0))
+}
+}
+--// Setup 2
+local Effects=ins("Model",{Name="Effects",Parent=Char})
+ins("ForceField",{Parent=char,Visible=false})
+local Ham=script.Data.Models.Sledgehammer Ham.Parent=char
+
+local HammerW = Instance.new("Weld", Char.Hammer)
+HammerW.Part0 = Char.Hammer
+HammerW.Part1 = Ham.Handle
+HammerW.C0 = CFrame.new(0,0,0) * CFrame.Angles(0, 0, math.rad(90))
+-- ^ for paid
+Ham.Handle.Transparency = 1
+Ham.Head.Transparency = 1
+
+local H1,H2,HE,HA,DR=Ham.Handle1,Ham.Handle2,Ham.Head,Ham.Handle,Ham.Dripper
+local HamW=ins("Motor6D",{Part0=la,Part1=H1,C1=cf(-.1,.1,.85)*angles(90,0,0,true),Parent=ra})
+if Player.UserId~=90745958 then Ham.CharmRing:Destroy() else Ham.CharmRing.Charm.CFrame=Ham.Handle.CFrame*cf(0,-Ham.Handle.Size.Y/2,0) Ham.CharmRing.Charm:SetNetworkOwner(Player) end
+local Dust=script.Data.Models.Dust
+local Theme=Sound(1370830572,.5,1,t,125,6.5,true)
+--// Functions
+function PlayAnimSingle(...)
+local Joints_={nec=nec,rutj=rutj,rs=rs,ls=ls,rh=rh,lh=lh,ham=HamW}
+local CFs_={necC0=necC0,necC1=necC1,rutjC0=rutjC0,rutjC1=rutjC1,rsC0=rsC0,rsC1=rsC1,lsC0=lsC0,lsC1=lsC1,rhC0=rhC0,rhC1=rhC1,lhC0=lhC0,lhC1=lhC1,hamC0=cf(),hamC1=cf(-.1,.1,.85)*angles(90,0,0,true)}
+for i,v in pairs({...}) do
+if Joints_[v[1]] then
+local T={}
+table.foreach(v[2],function(i,v) T[i]=v end)
+local C0=((CFs_[v[1].."C0"] or cf(0,0,0))*(T.C0 or cf(0,0,0))) or CFs_[v[1].."C0"]
+local C1=((CFs_[v[1].."C1"] or cf(0,0,0))*((T.C1 or cf(0,0,0))):Inverse())
+for i,v in pairs(T) do if i=="C0" then T.C0=C0 elseif i=="C1" then T.C1=C1 end end
+Tween(Joints_[v[1]],T,v[3])
+end
+end
+end
+function PlayAnim(Table,AddFuncs)
+AddFuncs=AddFuncs or {}
+local Waits=Table.Waits
+for i=1,#Table do
+local v=Table[i]
+if Waits[i] then
+local WaitTime=Waits[i]
+PlayAnimSingle(unpack(v))
+wait(WaitTime)
+if AddFuncs[i] then AddFuncs[i]() end
+end
+end
+end
+
+local Anims = {
+Swing={
+Waits={
+[1]=.25,
+[2]=.15
+},
+[1]={
+{"nec",{C1=CFrame.Angles(math.rad(0),math.rad(0),math.rad(-20))},{.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"rutj",{C1= CFrame.new(0,-0.1,0.2)*CFrame.Angles(math.rad(5),math.rad(-15),math.rad(0))},{.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"ls",{C0=CFrame.new(0.85,0.25,-0.65)*CFrame.Angles(math.rad(150),math.rad(-10),math.rad(20))},{.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"rh",{C1=CFrame.new(0,0,0)*CFrame.Angles(math.rad(0),math.rad(0),math.rad(0))},{.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"lh",{C1=CFrame.new(0,0,-0.2)*CFrame.Angles(math.rad(-12.5),math.rad(15),math.rad(0))},{.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+},
+[2]={
+{"nec",{C1=CFrame.Angles(math.rad(0),math.rad(0),math.rad(-5))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+{"rutj",{C1=CFrame.new(0,-0.1,-0.2)*CFrame.Angles(math.rad(-5),math.rad(5),math.rad(0))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+{"ls",{C0=CFrame.new(0.35,-0.15,-0.5)*CFrame.Angles(math.rad(40),math.rad(-30),math.rad(0))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+{"rh",{C1=CFrame.new(0,0,0)*CFrame.Angles(math.rad(0),math.rad(0),math.rad(0))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+{"lh",{C1=CFrame.new(0,0.25,-0.3)*CFrame.Angles(math.rad(-15),math.rad(10),math.rad(0))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+{"ham",{C0=CFrame.Angles(math.rad(-30),math.rad(0),math.rad(0))},{.15,Enum.EasingStyle.Quad,Enum.EasingDirection.In,0,false,0}},
+},
+},
+NoHit={
+{"nec",{C1=CFrame.Angles(math.rad(-5),math.rad(0),math.rad(-5))},{.15,Enum.EasingStyle.Sine,Enum.EasingDirection.Out,0,false,0}},
+{"rutj",{C1=CFrame.new(0,-0.1,-0.3)*CFrame.Angles(math.rad(-7.5),math.rad(5),math.rad(0))},{.15,Enum.EasingStyle.Sine,Enum.EasingDirection.Out,0,false,0}},
+{"ls",{C0=CFrame.new(0.35,-0.15,-0.5)*CFrame.Angles(math.rad(40),math.rad(-35),math.rad(0))},{.15,Enum.EasingStyle.Sine,Enum.EasingDirection.Out,0,false,0}},
+{"rh",{C1=CFrame.new(0,0,0)*CFrame.Angles(math.rad(0),math.rad(0),math.rad(0))},{.15,Enum.EasingStyle.Sine,Enum.EasingDirection.Out,0,false,0}},
+{"lh",{C1=CFrame.new(0,0,-0.3)*CFrame.Angles(math.rad(5),math.rad(10),math.rad(0))},{.15,Enum.EasingStyle.Sine,Enum.EasingDirection.Out,0,false,0}},
+},
+Hit={
+{"nec",{C1=CFrame.Angles(math.rad(2.5),math.rad(0),math.rad(-5))},{.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"rutj",{C1=CFrame.new(0,-0.1,0.3)*CFrame.Angles(math.rad(2.5),math.rad(5),math.rad(0))},{.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"ls",{C0=CFrame.new(0.35,-0.05,-0.25)*CFrame.Angles(math.rad(90),math.rad(0),math.rad(0))*CFrame.Angles(math.rad(0),math.rad(-30),math.rad(0))},{.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"rh",{C1=CFrame.new(0,0,0)*CFrame.Angles(math.rad(0),math.rad(0),math.rad(0))},{.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+{"lh",{C1=CFrame.new(0,0,-0.2)*CFrame.Angles(math.rad(-12),math.rad(10),math.rad(0))},{.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out,0,false,0}},
+}
+}
+--// Moves
+local function Hold()
+Holding=true
+Using=true
+Sound(({3929467655,3929467888})[random(1,2)],.4,random(.9,1.1,100),ra,35,5)
+PlayAnimSingle(unpack(Anims.Swing[1]))
+wait(Anims.Swing.Waits[1])
+Using=false
+end
+
+local function Swing()
+Using=true
+Holding=false
+Sound(2235655773,.275,random(.8,.9,100),HE,50,5).TimePosition=.35
+PlayAnimSingle(unpack(Anims.Swing[2]))
+wait(Anims.Swing.Waits[2])
+PlayAnimSingle(unpack(Anims.Hit))
+Sound(3417831369,.25,random(.9,1.1,100),HE,50,6.5)
+wait(.3)
+Using=false
+end
+
+Mouse.Button1Down:connect(function()
+if Using then return end
+Hold()
+end)
+
+Mouse.Button1Up:connect(function()
+if Using and Holding then repeat game:GetService("RunService").Heartbeat:Wait() until not Using end
+Swing()
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function()
+if Theme.Parent~=t then
+Instance.Remove(Theme)
+Theme=Sound(656478412,.5,1,t,125,6.5,true)
+Theme.TimePosition=TimePos
+end
+if Holding and tick()-LastTick>.15 then
+PlayAnimSingle(unpack(Anims.Swing[1]))
+end
+Theme.SoundId,Theme.Volume,Theme.Pitch,Theme.Looped,Theme.Playing,TimePos="rbxassetid://"..Music[MPos],Muted and 0 or .5,1,true,true,Theme.TimePosition
+Sine=Sine+Change
+local Direction=hum.MoveDirection
+if Direction.Magnitude==0 then Direction=t.Velocity/7.5 end
+local MoveZ=clamp((Direction*t.CFrame.LookVector).X+(Direction*t.CFrame.LookVector).Z,-1,1)
+local MoveX=clamp((Direction*t.CFrame.RightVector).X+(Direction*t.CFrame.RightVector).Z,-1,1)
+local Moving=(t.Velocity*v3(1,0,1)).Magnitude>.01
+local VerY=t.Velocity.Y
+local StandR,RPos,RNID=Raycast(t.CFrame*cf(t.Size.X/4,-t.Size.Y/2,0).Position,-HRP.CFrame.UpVector,{char},4,false)
+local StandL,LPos,LNID=Raycast(t.CFrame*cf(-t.Size.X/4,-t.Size.Y/2,0).Position,-HRP.CFrame.UpVector,{char},4,false)
+local Stand=StandR or StandL
+local Ang=cf(t.Position,Mouse.Hit.Position).LookVector
+hum.WalkSpeed,hum.JumpPower=(LockWS and WS or hum.WalkSpeed),(LockJP and JP or hum.JumpPower)
+DR.PE.Enabled=BloodTrans<=.5
+for i,v in pairs(HE:GetChildren()) do if v:IsA("Texture") then v.Transparency=BloodTrans end end
+BloodTrans=tick()-LastHitTick>3 and BloodTrans+.002 or BloodTrans
+if BloodTrans<.5 and random(0,1,25)==1 then Blood.new(DR.CFrame,v3(0,0,0),random(.1,.175,1000)) end
+if not Moving and Stand then
+Change=1
+local IdleVal=20
+local CF=(t.CFrame*rsC0*cf(-.25,-.65,0)):ToObjectSpace(cf(t.CFrame*rsC0*cf(0,-.65,0).Position,H2.Position))
+local X,Y,Z=(CF-CF.Position):ToOrientation()
+nec.C0=nec.C0:Lerp(necC0*cf(0,0,0)*angles(sin(Sine/IdleVal)*2,cotan(Sine/(IdleVal*3))*7.5,0,true)*Poses[1][1],.1)
+rutj.C0=rutj.C0:Lerp(rutjC0*cf(0,-1,0)*angles(Ang.Y/2,0,0)*cf(0,1,0)*cf(0,.05*cos(Sine/IdleVal),.05*cotan(Sine/IdleVal))*angles(cotan(Sine/IdleVal)*2,sin(Sine/(IdleVal*3.5))*2.5,cotan(Sine/(IdleVal*2))*-4,true)*Poses[1][2],.1)
+rs.C0=rs.C0:Lerp(rsC0*cf(-.25,-.65,0)*angles(X,0,Z)*angles(90,0,-20,true)*cf(0,1.5,0)*cf(0,-((t.CFrame*rsC0*cf(-.25,-.65,0)).Position-H2.Position).Magnitude,0),.65)
+ls.C0=ls.C0:Lerp(lsC0*cf(0,-.05*cos(Sine/IdleVal),0)*angles(sin(Sine/IdleVal)*2.25,-sin(Sine/(IdleVal*3.5))*2.5,sin(Sine/IdleVal)*-1.5,true)*Poses[1][4],.1)
+rh.C0=rh.C0:Lerp(rhC0*angles(-Ang.Y/2,0,0)*cf(0,-.05*cos(Sine/IdleVal)+.025*cotan(Sine/(IdleVal*2)),0)*angles(cotan(Sine/IdleVal)*-2+sin(Sine/(IdleVal*3.5))*-1.25,0,cotan(Sine/(IdleVal*2))*6.5,true)*Poses[1][5],.1)
+lh.C0=lh.C0:Lerp(lhC0*angles(-Ang.Y/2,0,0)*cf(0,-.05*cos(Sine/IdleVal)-.025*cotan(Sine/(IdleVal*2)),0)*angles(cotan(Sine/IdleVal)*-2+sin(Sine/(IdleVal*3.5))*1.25,0,cotan(Sine/(IdleVal*2))*6.5,true)*Poses[1][6],.1)
+elseif Moving and Stand then
+local WSVal=6/clamp(hum.WalkSpeed/16,.25,2)*t.Size.Y/2
+local CF=(t.CFrame*rsC0*cf(-.25,-.65,0)):ToObjectSpace(cf(t.CFrame*rsC0*cf(0,-.65,0).Position,H2.Position))
+local X,Y,Z=(CF-CF.Position):ToOrientation()
+Change=1
+nec.C0=nec.C0:Lerp(necC0*cf(0,0,0)*angles(sin(Sine/(WSVal/2))*2.5,0,0,true)*cf(0,0,0)*angles(5*MoveZ,-60*MoveX,0,true),.2/(t.Size.Y/2)*(hum.WalkSpeed/16)/3) --*cf((VerY/7.5)*MoveX,1*clamp(abs(VerY),0,1),(-VerY/7.5)*MoveZ)
+rutj.C0=rutj.C0:Lerp(rutjC0*cf(0,-1,0)*angles(Ang.Y/2,0,0)*cf(0,1,0)*cf(0,-2,0)*angles(VerY*2.5*MoveZ,0,VerY*2.5*MoveX,true)*cf(0,2,0)*cf(0,1*cos(Sine/(WSVal/2)),0)*angles(cotan(Sine/(WSVal/2))*22.5,sin(Sine/WSVal)*10,0,true)*cf(0,0,0)*angles(-10*MoveZ,0,-10*MoveX,true),.2/(t.Size.Y/2)*(hum.WalkSpeed/16)/3)
+--rs.C0=rs.C0:Lerp(rsC0*cf(0,0,.5*sin(Sine/WSVal)*MoveZ)*angles(-cotan(Sine/WSVal)*120*MoveZ,0,0,true)*angles(0,-cotan(Sine/WSVal)*70*MoveZ,0,true)*cf(-.15,0,0)*angles(10,0,-10*abs(MoveZ),true),.2/(t.Size.Y/2)*(hum.WalkSpeed/16)/3)
+rs.C0=rs.C0:Lerp(rsC0*cf(-.25,-.65,0)*angles(X,0,Z)*angles(90,0,-20,true)*cf(0,1.5,0)*cf(0,-((t.CFrame*rsC0*cf(-.25,-.65,0)).Position-H2.Position).Magnitude,0),.65)
+ls.C0=ls.C0:Lerp(lsC0*cf(0,-.05*cos(Sine/WSVal),0)*angles(sin(Sine/WSVal)*2.25,-sin(Sine/(WSVal*3.5))*2.5,sin(Sine/WSVal)*-1.5,true)*Poses[1][4],.1)
+rh.C0=rh.C0:Lerp(rhC0*angles(-Ang.Y/2,0,0)*cf(0,.1+.75*cos(Sine/WSVal),-.2-.9*cos(Sine/WSVal))*angles(cotan(Sine/WSVal)*190*MoveZ,0,cotan(Sine/WSVal)*160*MoveX,true)*cf(0,0,0)*angles(-7.5*abs(MoveZ),0,0,true),.2/(t.Size.Y/2)*(hum.WalkSpeed/16)/3)
+lh.C0=lh.C0:Lerp(lhC0*angles(-Ang.Y/2,0,0)*cf(0,.1+-.75*cos(Sine/WSVal),-.2+.9*cos(Sine/WSVal))*angles(-cotan(Sine/WSVal)*190*MoveZ,0,-cotan(Sine/WSVal)*160*MoveX,true)*cf(0,0,0)*angles(-7.5*abs(MoveZ),0,0,true),.2/(t.Size.Y/2)*(hum.WalkSpeed/16)/3)
+--thanks to kyu or neb.. whatever
+if cos(Sine/WSVal)/2>.2 and Step=="L" then
+Step="R"
+if StandR then
+local SoundId=StepSounds[StandR.Material.Name] or 0
+if StandR.Material=="Sand" and (StandR.Color.r>.7 and StandR.Color.g>.7 and StandR.Color.b>.7) then
+SoundId=StepSounds["Snow"]
+end
+if StandR.Name=="Water" then SoundId=StepSounds.Water end
+local SizeVal=StandR.Size*RNID
+if SoundId==941640049 then
+SizeVal=SizeVal/2
+end
+Sound(SoundId,(.35*clamp((WSVal)/1.5,.5,3.5))/clamp(math.max(SizeVal.X,SizeVal.Y,SizeVal.Z),.5,1.25),random(.9,1.1,100)*clamp(math.max(SizeVal.X,SizeVal.Y,SizeVal.Z)/10,.5,1.2)*clamp((WSVal)/1.5,.5,2),t)
+end
+end
+if cos(Sine/WSVal)/2<-.2 and Step=="R" then
+Step="L"
+if StandL then
+local SoundId=StepSounds[StandL.Material.Name] or 0
+if StandL.Material==Enum.Material.Sand and (StandL.Color.r>.7 and StandL.Color.g>.7 and StandL.Color.b>.7) then
+SoundId=StepSounds["Snow"]
+end
+if StandL.Name=="Water" then SoundId=StepSounds.Water end
+local SizeVal=StandL.Size*LNID
+if SoundId==941640049 then
+SizeVal=SizeVal/2
+end
+Sound(SoundId,(.35*clamp((WSVal)/1.5,.5,3.5))/clamp(math.max(SizeVal.X,SizeVal.Y,SizeVal.Z),.5,1.25),random(.9,1.1,100)*clamp(math.max(SizeVal.X,SizeVal.Y,SizeVal.Z)/10,.5,1.2)*clamp((WSVal)/1.5,.5,2),t)
+end
+end
+elseif not Stand then
+local CF=(t.CFrame*rsC0*cf(-.25,-.65,0)):ToObjectSpace(cf(t.CFrame*rsC0*cf(0,-.65,0).Position,H2.Position))
+local X,Y,Z=(CF-CF.Position):ToOrientation()
+Change=1
+nec.C0=nec.C0:Lerp(necC0*cf(0,0,0)*angles(0,0,0,true)*cf(0,0,0)*angles(clamp(hrp.Velocity.Y,-15,15),0,0,true),.2)
+rutj.C0=rutj.C0:Lerp(rutjC0*cf(0,0,0)*angles(0,0,0,true)*cf(0,0,0)*angles(clamp(hrp.Velocity.Y,-30,20),0,0,true),.2)
+rs.C0=rs.C0:Lerp(rsC0*cf(-.25,-.65,0)*angles(X,0,Z)*angles(90,0,-20,true)*cf(0,1.5,0)*cf(0,-((t.CFrame*rsC0*cf(-.25,-.65,0)).Position-H2.Position).Magnitude,0),.65)
+ls.C0=ls.C0:Lerp(lsC0*cf(0,-.05*cos(Sine/20),0)*angles(sin(Sine/20)*2.25,-sin(Sine/(20*3.5))*2.5,sin(Sine/20)*-1.5,true)*Poses[1][4],.1)
+rh.C0=rh.C0:Lerp(rhC0*cf(0,0,0)*angles(0,0,0,true)*cf(0,.4,-.35)*angles(-10,-5,5,true),.2)
+lh.C0=lh.C0:Lerp(lhC0*cf(0,0,0)*angles(clamp(-hrp.Velocity.Y,-25,35),0,0,true)*cf(0,.2,-.15)*angles(-2.5,5,-5,true),.2)
+end
+if Type=="R6" then
+nec.C1=nec.C1:Lerp(necC1,.2)
+rutj.C1=rutj.C1:Lerp(rutjC1,.2)
+rs.C1=rs.C1:Lerp(rsC1,.2)
+ls.C1=ls.C1:Lerp(lsC1,.2)
+rh.C1=rh.C1:Lerp(rhC1,.2)
+lh.C1=lh.C1:Lerp(lhC1,.2)
+HamW.C0=HamW.C0:Lerp(cf(),.2)
+necC0,necC1=cf(0,t.Size.Y/2,0),cf(0,-h.Size.Y/2,0)
+rutjC0,rutjC1=cf(0,0,0),cf(0,0,0)
+rsC0,rsC1=cf(t.Size.X/2,t.Size.Y/4,0),cf(-ra.Size.X/2,ra.Size.Y/4,0)
+lsC0,lsC1=cf(-t.Size.X/2,t.Size.Y/4,0),cf(la.Size.X/2,la.Size.Y/4,0)
+rhC0,rhC1=cf(t.Size.X/4,-t.Size.Y/2,0),cf(0,rl.Size.Y/2,0)
+lhC0,lhC1=cf(-t.Size.X/4,-t.Size.Y/2,0),cf(0,ll.Size.Y/2,0)
+end
+end)
