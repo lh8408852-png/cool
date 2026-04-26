@@ -1,0 +1,927 @@
+local Players          = game:GetService("Players")
+local TweenService     = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local player    = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local camera    = workspace.CurrentCamera
+
+-- ────────────────────────────────────────────────────────────
+-- Constants
+-- ────────────────────────────────────────────────────────────
+local MIN_W, MIN_H   = 380, 260
+local MAX_W, MAX_H   = 950, 750
+local INIT_W, INIT_H = 500, 360
+local TOGGLE_KEY     = Enum.KeyCode.RightShift
+
+-- ────────────────────────────────────────────────────────────
+-- Active theme  (mutable, shared reference)
+-- ────────────────────────────────────────────────────────────
+local theme = {
+	background = Color3.fromRGB(25,  25,  25),
+	tabColor   = Color3.fromRGB(50,  50,  50),
+	textColor  = Color3.fromRGB(255, 255, 255),
+	accent     = Color3.fromRGB(100, 200, 255),
+}
+
+-- ────────────────────────────────────────────────────────────
+-- Built-in themes
+-- ────────────────────────────────────────────────────────────
+local themes = {
+	Default = {
+		background = Color3.fromRGB(25,  25,  25),
+		tabColor   = Color3.fromRGB(50,  50,  50),
+		textColor  = Color3.fromRGB(255, 255, 255),
+		accent     = Color3.fromRGB(100, 200, 255),
+	},
+	["Green Fallout"] = {
+		background = Color3.fromRGB(5,   50,  15),
+		tabColor   = Color3.fromRGB(15,  100, 30),
+		textColor  = Color3.fromRGB(160, 255, 160),
+		accent     = Color3.fromRGB(100, 255, 100),
+	},
+	Cyberpunk = {
+		background = Color3.fromRGB(25,  0,   40),
+		tabColor   = Color3.fromRGB(70,  0,   130),
+		textColor  = Color3.fromRGB(255, 100, 255),
+		accent     = Color3.fromRGB(220, 20,  255),
+	},
+}
+local themeOrder = {"Default", "Green Fallout", "Cyberpunk"}
+
+-- ────────────────────────────────────────────────────────────
+-- ScreenGui
+-- ────────────────────────────────────────────────────────────
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name           = "SkidModernGUI"
+screenGui.ResetOnSpawn   = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent         = playerGui
+
+-- ────────────────────────────────────────────────────────────
+-- Main window  (AnchorPoint 0,0 – pure offset, resize-friendly)
+-- ────────────────────────────────────────────────────────────
+local vp   = camera.ViewportSize
+local winX = math.floor((vp.X - INIT_W) / 2)
+local winY = math.floor((vp.Y - INIT_H) / 2)
+local winW, winH = INIT_W, INIT_H
+
+local mainFrame = Instance.new("Frame")
+mainFrame.AnchorPoint      = Vector2.new(0, 0)
+mainFrame.Position         = UDim2.new(0, winX, 0, winY)
+mainFrame.Size             = UDim2.new(0, winW, 0, winH)
+mainFrame.BackgroundColor3 = theme.background
+mainFrame.BorderSizePixel  = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Parent           = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+-- Title bar
+local titleBar = Instance.new("Frame", mainFrame)
+titleBar.Size             = UDim2.new(1, 0, 0, 40)
+titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+titleBar.BorderSizePixel  = 0
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 12)
+
+local titleLabel = Instance.new("TextLabel", titleBar)
+titleLabel.Size               = UDim2.new(1, -90, 1, 0)
+titleLabel.Position           = UDim2.new(0, 12, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text               = "Skid UI | Modern Hub"
+titleLabel.Font               = Enum.Font.GothamBold
+titleLabel.TextSize           = 18
+titleLabel.TextColor3         = theme.accent
+titleLabel.TextXAlignment     = Enum.TextXAlignment.Left
+titleLabel.TextYAlignment     = Enum.TextYAlignment.Center
+
+local sizeLabel = Instance.new("TextLabel", titleBar)
+sizeLabel.Size               = UDim2.new(0, 80, 1, 0)
+sizeLabel.Position           = UDim2.new(1, -86, 0, 0)
+sizeLabel.BackgroundTransparency = 1
+sizeLabel.Font               = Enum.Font.Gotham
+sizeLabel.TextSize           = 11
+sizeLabel.TextColor3         = Color3.fromRGB(140, 140, 140)
+sizeLabel.TextXAlignment     = Enum.TextXAlignment.Right
+sizeLabel.TextYAlignment     = Enum.TextYAlignment.Center
+
+local function updateSizeLabel()
+	sizeLabel.Text = winW .. " × " .. winH .. "  "
+end
+updateSizeLabel()
+
+-- Sidebar
+local sidebar = Instance.new("Frame", mainFrame)
+sidebar.Size             = UDim2.new(0, 140, 1, -40)
+sidebar.Position         = UDim2.new(0, 0, 0, 40)
+sidebar.BackgroundColor3 = theme.tabColor
+sidebar.BorderSizePixel  = 0
+Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 8)
+
+local sidebarLayout = Instance.new("UIListLayout", sidebar)
+sidebarLayout.Padding   = UDim.new(0, 4)
+sidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local sbPad = Instance.new("UIPadding", sidebar)
+sbPad.PaddingTop   = UDim.new(0, 8)
+sbPad.PaddingLeft  = UDim.new(0, 8)
+sbPad.PaddingRight = UDim.new(0, 8)
+
+-- Content area
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Size                 = UDim2.new(1, -150, 1, -50)
+contentFrame.Position             = UDim2.new(0, 150, 0, 45)
+contentFrame.BackgroundTransparency = 1
+
+-- ────────────────────────────────────────────────────────────
+-- Notification
+-- ────────────────────────────────────────────────────────────
+local notifFrame = Instance.new("Frame", screenGui)
+notifFrame.Size             = UDim2.new(0, 280, 0, 40)
+notifFrame.Position         = UDim2.new(1, 300, 1, -50)
+notifFrame.AnchorPoint      = Vector2.new(1, 1)
+notifFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+notifFrame.BorderSizePixel  = 0
+Instance.new("UICorner", notifFrame).CornerRadius = UDim.new(0, 8)
+
+local notifText = Instance.new("TextLabel", notifFrame)
+notifText.Size               = UDim2.new(1, -20, 1, 0)
+notifText.Position           = UDim2.new(0, 10, 0, 0)
+notifText.BackgroundTransparency = 1
+notifText.TextColor3         = Color3.fromRGB(255, 255, 255)
+notifText.Font               = Enum.Font.GothamSemibold
+notifText.TextSize           = 15
+notifText.TextXAlignment     = Enum.TextXAlignment.Left
+notifText.TextYAlignment     = Enum.TextYAlignment.Center
+
+local notifVisible = false
+local notifTweenIn, notifTweenOut
+
+local function showNotif(text, success)
+	if notifVisible then return end
+	notifVisible = true
+	notifText.Text              = (success and "✅ " or "❌ ") .. text
+	notifFrame.BackgroundColor3 = success and Color3.fromRGB(30, 80, 30) or Color3.fromRGB(120, 30, 30)
+	if notifTweenOut then notifTweenOut:Cancel() end
+	notifTweenIn = TweenService:Create(notifFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad),
+		{Position = UDim2.new(1, -10, 1, -50)})
+	notifTweenIn:Play()
+	task.delay(3.5, function()
+		if notifTweenIn then notifTweenIn:Cancel() end
+		notifTweenOut = TweenService:Create(notifFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad),
+			{Position = UDim2.new(1, 300, 1, -50)})
+		notifTweenOut:Play()
+		notifTweenOut.Completed:Wait()
+		notifVisible = false
+	end)
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Tab system
+-- ────────────────────────────────────────────────────────────
+local tabPages   = {}
+local tabButtons = {}
+local tabCount   = 0
+
+local function createTab(name)
+	tabCount += 1
+
+	local btn = Instance.new("TextButton", sidebar)
+	btn.Size             = UDim2.new(1, 0, 0, 30)
+	btn.BackgroundColor3 = theme.background
+	btn.TextColor3       = theme.textColor
+	btn.Text             = name
+	btn.Font             = Enum.Font.Gotham
+	btn.TextSize         = 15
+	btn.BorderSizePixel  = 0
+	btn.LayoutOrder      = tabCount
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+	tabButtons[name] = btn
+
+	local page = Instance.new("ScrollingFrame", contentFrame)
+	page.Size                = UDim2.new(1, 0, 1, 0)
+	page.CanvasSize          = UDim2.new(0, 0, 0, 0)
+	page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	page.ScrollBarThickness  = 4
+	page.BackgroundTransparency = 1
+	page.Visible             = false
+	page.BorderSizePixel     = 0
+
+	local layout = Instance.new("UIListLayout", page)
+	layout.Padding   = UDim.new(0, 7)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local pad = Instance.new("UIPadding", page)
+	pad.PaddingLeft  = UDim.new(0, 10)
+	pad.PaddingRight = UDim.new(0, 10)
+	pad.PaddingTop   = UDim.new(0, 6)
+
+	layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		page.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
+	end)
+
+	tabPages[name] = page
+
+	btn.MouseButton1Click:Connect(function()
+		for _, p in pairs(tabPages) do p.Visible = false end
+		page.Visible = true
+	end)
+
+	if tabCount == 1 then page.Visible = true end
+end
+
+createTab("Hubs")
+createTab("Reanimations")
+createTab("Parts")
+createTab("Settings")
+
+-- ────────────────────────────────────────────────────────────
+-- Layout order counters
+-- ────────────────────────────────────────────────────────────
+local pageOrder = {}
+local function nextOrder(page)
+	pageOrder[page] = (pageOrder[page] or 0) + 1
+	return pageOrder[page]
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Theme application
+-- ────────────────────────────────────────────────────────────
+local function applyTheme(t)
+	theme.background = t.background
+	theme.tabColor   = t.tabColor
+	theme.textColor  = t.textColor
+	theme.accent     = t.accent
+
+	mainFrame.BackgroundColor3 = t.background
+	sidebar.BackgroundColor3   = t.tabColor
+	titleBar.BackgroundColor3  = t.background:Lerp(t.tabColor, 0.5)
+	titleLabel.TextColor3      = t.accent
+
+	for _, btn in pairs(sidebar:GetChildren()) do
+		if btn:IsA("TextButton") then
+			btn.BackgroundColor3 = t.background
+			btn.TextColor3       = t.textColor
+		end
+	end
+
+	for _, page in pairs(tabPages) do
+		for _, child in pairs(page:GetChildren()) do
+			if child:IsA("TextLabel") then
+				child.TextColor3 = child.Text:sub(1,2) == "[ " and t.accent or t.textColor
+			end
+		end
+	end
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Reusable slider  (returns track frame)
+-- initVal: 0–1, onChange receives 0–1
+-- ────────────────────────────────────────────────────────────
+local function makeSlider(parent, fillColor, initVal, onChange)
+	local track = Instance.new("Frame", parent)
+	track.Size             = UDim2.new(1, 0, 0, 14)
+	track.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	track.BorderSizePixel  = 0
+	Instance.new("UICorner", track).CornerRadius = UDim.new(1, 0)
+
+	local fill = Instance.new("Frame", track)
+	fill.Size             = UDim2.new(math.clamp(initVal, 0, 1), 0, 1, 0)
+	fill.BackgroundColor3 = fillColor
+	fill.BorderSizePixel  = 0
+	Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
+
+	local knob = Instance.new("Frame", track)
+	knob.Size         = UDim2.new(0, 12, 0, 12)
+	knob.AnchorPoint  = Vector2.new(0.5, 0.5)
+	knob.Position     = UDim2.new(math.clamp(initVal, 0, 1), 0, 0.5, 0)
+	knob.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+	knob.BorderSizePixel  = 0
+	knob.ZIndex       = 2
+	Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+	local hitbox = Instance.new("TextButton", track)
+	hitbox.Size                 = UDim2.new(1, 0, 1, 0)
+	hitbox.BackgroundTransparency = 1
+	hitbox.Text                 = ""
+	hitbox.AutoButtonColor      = false
+	hitbox.ZIndex               = 3
+
+	local isDragging = false
+	hitbox.MouseButton1Down:Connect(function() isDragging = true end)
+	UserInputService.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then isDragging = false end
+	end)
+	UserInputService.InputChanged:Connect(function(i)
+		if not isDragging then return end
+		if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+		local v = math.clamp((i.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+		fill.Size     = UDim2.new(v, 0, 1, 0)
+		knob.Position = UDim2.new(v, 0, 0.5, 0)
+		onChange(v)
+	end)
+
+	return track
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Color picker  (R, G, B sliders + preview swatch)
+-- Returns (container, getColor, setColor)
+-- ────────────────────────────────────────────────────────────
+local function makeColorPicker(parent, label, defaultColor, order, onChange)
+	local r = math.round(defaultColor.R * 255)
+	local g = math.round(defaultColor.G * 255)
+	local b = math.round(defaultColor.B * 255)
+
+	local container = Instance.new("Frame", parent)
+	container.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+	container.BorderSizePixel  = 0
+	container.LayoutOrder      = order
+	Instance.new("UICorner", container).CornerRadius = UDim.new(0, 8)
+
+	local innerLayout = Instance.new("UIListLayout", container)
+	innerLayout.Padding   = UDim.new(0, 5)
+	innerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local innerPad = Instance.new("UIPadding", container)
+	innerPad.PaddingLeft   = UDim.new(0, 10)
+	innerPad.PaddingRight  = UDim.new(0, 10)
+	innerPad.PaddingTop    = UDim.new(0, 7)
+	innerPad.PaddingBottom = UDim.new(0, 7)
+
+	innerLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		container.Size = UDim2.new(1, 0, 0, innerLayout.AbsoluteContentSize.Y + 16)
+	end)
+
+	-- Header: label + preview swatch
+	local header = Instance.new("Frame", container)
+	header.Size               = UDim2.new(1, 0, 0, 18)
+	header.BackgroundTransparency = 1
+	header.LayoutOrder        = 1
+
+	local lbl = Instance.new("TextLabel", header)
+	lbl.Size               = UDim2.new(1, -36, 1, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text               = label
+	lbl.Font               = Enum.Font.GothamSemibold
+	lbl.TextSize           = 13
+	lbl.TextColor3         = theme.accent
+	lbl.TextXAlignment     = Enum.TextXAlignment.Left
+
+	local preview = Instance.new("Frame", header)
+	preview.Size             = UDim2.new(0, 28, 0, 18)
+	preview.Position         = UDim2.new(1, -28, 0, 0)
+	preview.BackgroundColor3 = defaultColor
+	preview.BorderSizePixel  = 0
+	Instance.new("UICorner", preview).CornerRadius = UDim.new(0, 4)
+
+	local function refresh()
+		local c = Color3.fromRGB(r, g, b)
+		preview.BackgroundColor3 = c
+		onChange(c)
+	end
+
+	local channels = {
+		{n="R", col=Color3.fromRGB(210,70,70),  get=function() return r end, set=function(v) r=v end},
+		{n="G", col=Color3.fromRGB(70,190,70),  get=function() return g end, set=function(v) g=v end},
+		{n="B", col=Color3.fromRGB(70,120,220), get=function() return b end, set=function(v) b=v end},
+	}
+
+	for i, ch in ipairs(channels) do
+		local row = Instance.new("Frame", container)
+		row.Size               = UDim2.new(1, 0, 0, 14)
+		row.BackgroundTransparency = 1
+		row.LayoutOrder        = i + 1
+
+		local rowLayout = Instance.new("UIListLayout", row)
+		rowLayout.FillDirection     = Enum.FillDirection.Horizontal
+		rowLayout.Padding           = UDim.new(0, 5)
+		rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+		local chLbl = Instance.new("TextLabel", row)
+		chLbl.Size               = UDim2.new(0, 10, 1, 0)
+		chLbl.BackgroundTransparency = 1
+		chLbl.Text               = ch.n
+		chLbl.Font               = Enum.Font.GothamBold
+		chLbl.TextSize           = 11
+		chLbl.TextColor3         = ch.col
+		chLbl.TextXAlignment     = Enum.TextXAlignment.Center
+
+		local sliderWrap = Instance.new("Frame", row)
+		sliderWrap.Size               = UDim2.new(1, -15, 1, 0)
+		sliderWrap.BackgroundTransparency = 1
+
+		makeSlider(sliderWrap, ch.col, ch.get() / 255, function(v)
+			ch.set(math.round(v * 255))
+			refresh()
+		end)
+	end
+
+	local function getColor() return Color3.fromRGB(r, g, b) end
+	local function setColor(c)
+		r = math.round(c.R * 255)
+		g = math.round(c.G * 255)
+		b = math.round(c.B * 255)
+		preview.BackgroundColor3 = c
+	end
+
+	return container, getColor, setColor
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Shared content helpers
+-- ────────────────────────────────────────────────────────────
+local failLogEntries = {}
+
+local function addFailLogEntry(text)
+	-- failLogFrame is declared below; we reach it via screenGui search
+	local flf = screenGui:FindFirstChild("SkidFailLog", true)
+	if not flf then return end
+	local entry = Instance.new("TextLabel", flf)
+	entry.Size               = UDim2.new(1, -10, 0, 18)
+	entry.BackgroundTransparency = 1
+	entry.TextColor3         = Color3.fromRGB(255, 100, 100)
+	entry.Font               = Enum.Font.Gotham
+	entry.TextSize           = 13
+	entry.TextXAlignment     = Enum.TextXAlignment.Left
+	entry.Text               = text
+	entry.LayoutOrder        = #failLogEntries + 1
+	table.insert(failLogEntries, entry)
+end
+
+local function addCategoryLabel(tab, text)
+	local lbl = Instance.new("TextLabel", tab)
+	lbl.Text                 = "[ " .. text .. " ]"
+	lbl.Size                 = UDim2.new(1, 0, 0, 22)
+	lbl.TextColor3           = theme.accent
+	lbl.BackgroundTransparency = 1
+	lbl.Font                 = Enum.Font.GothamSemibold
+	lbl.TextSize             = 15
+	lbl.TextXAlignment       = Enum.TextXAlignment.Left
+	lbl.LayoutOrder          = nextOrder(tab)
+end
+
+local function addScriptButton(tab, title, url)
+	local btn = Instance.new("TextButton", tab)
+	btn.Size             = UDim2.new(1, 0, 0, 28)
+	btn.Text             = "▶  " .. title
+	btn.Font             = Enum.Font.Gotham
+	btn.TextSize         = 13
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.TextColor3       = theme.textColor
+	btn.AutoButtonColor  = true
+	btn.BorderSizePixel  = 0
+	btn.TextXAlignment   = Enum.TextXAlignment.Left
+	btn.LayoutOrder      = nextOrder(tab)
+	local p = Instance.new("UIPadding", btn)
+	p.PaddingLeft = UDim.new(0, 10)
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+	btn.MouseButton1Click:Connect(function()
+		local ok, err = pcall(function() loadstring(game:HttpGet(url))() end)
+		if ok then
+			showNotif(title .. " loaded.", true)
+		else
+			showNotif(title .. " failed.", false)
+			addFailLogEntry(title .. ": " .. tostring(err))
+		end
+	end)
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Settings page
+-- ────────────────────────────────────────────────────────────
+local sp = tabPages["Settings"]
+
+-- Fail log
+local failLogHeader = Instance.new("TextLabel", sp)
+failLogHeader.Size               = UDim2.new(1, 0, 0, 22)
+failLogHeader.BackgroundTransparency = 1
+failLogHeader.TextColor3         = theme.accent
+failLogHeader.Font               = Enum.Font.GothamSemibold
+failLogHeader.TextSize           = 15
+failLogHeader.Text               = "Load Fail Log"
+failLogHeader.TextXAlignment     = Enum.TextXAlignment.Left
+failLogHeader.LayoutOrder        = nextOrder(sp)
+
+local failLogFrame = Instance.new("ScrollingFrame", sp)
+failLogFrame.Name               = "SkidFailLog"
+failLogFrame.Size               = UDim2.new(1, 0, 0, 90)
+failLogFrame.BackgroundColor3   = Color3.fromRGB(30, 30, 30)
+failLogFrame.BorderSizePixel    = 0
+failLogFrame.CanvasSize         = UDim2.new(0, 0, 0, 0)
+failLogFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+failLogFrame.ScrollBarThickness = 5
+failLogFrame.ClipsDescendants   = true
+failLogFrame.LayoutOrder        = nextOrder(sp)
+Instance.new("UICorner", failLogFrame).CornerRadius = UDim.new(0, 6)
+local flLayout = Instance.new("UIListLayout", failLogFrame)
+flLayout.Padding = UDim.new(0, 3)
+flLayout.SortOrder = Enum.SortOrder.LayoutOrder
+local flPad = Instance.new("UIPadding", failLogFrame)
+flPad.PaddingLeft = UDim.new(0, 6)
+flPad.PaddingTop  = UDim.new(0, 4)
+
+-- Transparency
+local transLbl = Instance.new("TextLabel", sp)
+transLbl.Size               = UDim2.new(1, 0, 0, 20)
+transLbl.BackgroundTransparency = 1
+transLbl.TextColor3         = theme.accent
+transLbl.Font               = Enum.Font.GothamSemibold
+transLbl.TextSize           = 15
+transLbl.Text               = "UI Transparency"
+transLbl.TextXAlignment     = Enum.TextXAlignment.Left
+transLbl.LayoutOrder        = nextOrder(sp)
+
+local transWrap = Instance.new("Frame", sp)
+transWrap.Size               = UDim2.new(1, 0, 0, 18)
+transWrap.BackgroundTransparency = 1
+transWrap.LayoutOrder        = nextOrder(sp)
+makeSlider(transWrap, theme.accent, 0, function(v)
+	local t = v * 0.85
+	mainFrame.BackgroundTransparency = t
+	sidebar.BackgroundTransparency   = t
+	titleBar.BackgroundTransparency  = t
+end)
+
+-- Terminate
+local terminateBtn = Instance.new("TextButton", sp)
+terminateBtn.Size             = UDim2.new(1, 0, 0, 30)
+terminateBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+terminateBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
+terminateBtn.Font             = Enum.Font.GothamBold
+terminateBtn.TextSize         = 15
+terminateBtn.Text             = "Terminate GUI"
+terminateBtn.BorderSizePixel  = 0
+terminateBtn.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", terminateBtn).CornerRadius = UDim.new(0, 6)
+terminateBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+
+-- Title changer
+local titleChangeLbl = Instance.new("TextLabel", sp)
+titleChangeLbl.Size               = UDim2.new(1, 0, 0, 20)
+titleChangeLbl.BackgroundTransparency = 1
+titleChangeLbl.TextColor3         = theme.accent
+titleChangeLbl.Font               = Enum.Font.GothamSemibold
+titleChangeLbl.TextSize           = 15
+titleChangeLbl.Text               = "Change Title Text"
+titleChangeLbl.TextXAlignment     = Enum.TextXAlignment.Left
+titleChangeLbl.LayoutOrder        = nextOrder(sp)
+
+local titleBox = Instance.new("TextBox", sp)
+titleBox.Size             = UDim2.new(1, 0, 0, 30)
+titleBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+titleBox.TextColor3       = Color3.fromRGB(255, 255, 255)
+titleBox.Font             = Enum.Font.Gotham
+titleBox.TextSize         = 14
+titleBox.PlaceholderText  = "Enter new title..."
+titleBox.ClearTextOnFocus = false
+titleBox.BorderSizePixel  = 0
+titleBox.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", titleBox).CornerRadius = UDim.new(0, 6)
+titleBox.FocusLost:Connect(function(enter)
+	if enter and titleBox.Text ~= "" then
+		titleLabel.Text = titleBox.Text
+	end
+end)
+
+-- ── Theme Selector ──────────────────────────────────────────
+local themeSectLbl = Instance.new("TextLabel", sp)
+themeSectLbl.Size               = UDim2.new(1, 0, 0, 22)
+themeSectLbl.BackgroundTransparency = 1
+themeSectLbl.TextColor3         = theme.accent
+themeSectLbl.Font               = Enum.Font.GothamSemibold
+themeSectLbl.TextSize           = 15
+themeSectLbl.Text               = "[ Themes ]"
+themeSectLbl.TextXAlignment     = Enum.TextXAlignment.Left
+themeSectLbl.LayoutOrder        = nextOrder(sp)
+
+local themeDropdown = Instance.new("TextButton", sp)
+themeDropdown.Size             = UDim2.new(1, 0, 0, 30)
+themeDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+themeDropdown.TextColor3       = Color3.fromRGB(255, 255, 255)
+themeDropdown.Font             = Enum.Font.Gotham
+themeDropdown.TextSize         = 15
+themeDropdown.Text             = "Select Theme  ▾"
+themeDropdown.BorderSizePixel  = 0
+themeDropdown.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", themeDropdown).CornerRadius = UDim.new(0, 6)
+
+local dropdownList = Instance.new("Frame", sp)
+dropdownList.Size             = UDim2.new(1, 0, 0, 0)
+dropdownList.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+dropdownList.ClipsDescendants = true
+dropdownList.BorderSizePixel  = 0
+dropdownList.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", dropdownList).CornerRadius = UDim.new(0, 6)
+
+local dropListLayout = Instance.new("UIListLayout", dropdownList)
+dropListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+dropListLayout.Padding   = UDim.new(0, 2)
+
+local dropPad = Instance.new("UIPadding", dropdownList)
+dropPad.PaddingTop    = UDim.new(0, 4)
+dropPad.PaddingBottom = UDim.new(0, 4)
+dropPad.PaddingLeft   = UDim.new(0, 4)
+dropPad.PaddingRight  = UDim.new(0, 4)
+
+local OPTION_H   = 28
+local DROPMATION = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
+local dropOpen   = false
+
+local function rebuildDropdown()
+	for _, c in pairs(dropdownList:GetChildren()) do
+		if c:IsA("TextButton") then c:Destroy() end
+	end
+	for i, name in ipairs(themeOrder) do
+		local opt = Instance.new("TextButton", dropdownList)
+		opt.Size             = UDim2.new(1, 0, 0, OPTION_H)
+		opt.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		opt.TextColor3       = Color3.fromRGB(255, 255, 255)
+		opt.Font             = Enum.Font.Gotham
+		opt.TextSize         = 14
+		opt.Text             = name
+		opt.BorderSizePixel  = 0
+		opt.LayoutOrder      = i
+		Instance.new("UICorner", opt).CornerRadius = UDim.new(0, 5)
+		opt.MouseButton1Click:Connect(function()
+			applyTheme(themes[name])
+			themeDropdown.Text = name .. "  ▾"
+			dropOpen = false
+			TweenService:Create(dropdownList, DROPMATION, {Size = UDim2.new(1, 0, 0, 0)}):Play()
+		end)
+	end
+end
+rebuildDropdown()
+
+themeDropdown.MouseButton1Click:Connect(function()
+	dropOpen = not dropOpen
+	local totalH = dropOpen and (#themeOrder * (OPTION_H + 2) + 10) or 0
+	TweenService:Create(dropdownList, DROPMATION, {Size = UDim2.new(1, 0, 0, totalH)}):Play()
+end)
+
+-- ── Custom Theme Creator ────────────────────────────────────
+local customSectLbl = Instance.new("TextLabel", sp)
+customSectLbl.Size               = UDim2.new(1, 0, 0, 22)
+customSectLbl.BackgroundTransparency = 1
+customSectLbl.TextColor3         = theme.accent
+customSectLbl.Font               = Enum.Font.GothamSemibold
+customSectLbl.TextSize           = 15
+customSectLbl.Text               = "[ Custom Theme Creator ]"
+customSectLbl.TextXAlignment     = Enum.TextXAlignment.Left
+customSectLbl.LayoutOrder        = nextOrder(sp)
+
+local themeNameBox = Instance.new("TextBox", sp)
+themeNameBox.Size             = UDim2.new(1, 0, 0, 30)
+themeNameBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+themeNameBox.TextColor3       = Color3.fromRGB(255, 255, 255)
+themeNameBox.Font             = Enum.Font.Gotham
+themeNameBox.TextSize         = 14
+themeNameBox.PlaceholderText  = "Theme name..."
+themeNameBox.ClearTextOnFocus = false
+themeNameBox.BorderSizePixel  = 0
+themeNameBox.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", themeNameBox).CornerRadius = UDim.new(0, 6)
+
+-- Mutable color table for the creator
+local cc = {
+	background = Color3.fromRGB(25,  25,  25),
+	tabColor   = Color3.fromRGB(50,  50,  50),
+	textColor  = Color3.fromRGB(255, 255, 255),
+	accent     = Color3.fromRGB(100, 200, 255),
+}
+
+makeColorPicker(sp, "Background", cc.background, nextOrder(sp), function(c) cc.background = c end)
+makeColorPicker(sp, "Tab Color",  cc.tabColor,   nextOrder(sp), function(c) cc.tabColor   = c end)
+makeColorPicker(sp, "Text Color", cc.textColor,  nextOrder(sp), function(c) cc.textColor  = c end)
+makeColorPicker(sp, "Accent",     cc.accent,     nextOrder(sp), function(c) cc.accent     = c end)
+
+-- Preview button (applies without saving)
+local previewThemeBtn = Instance.new("TextButton", sp)
+previewThemeBtn.Size             = UDim2.new(1, 0, 0, 28)
+previewThemeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 130)
+previewThemeBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
+previewThemeBtn.Font             = Enum.Font.GothamSemibold
+previewThemeBtn.TextSize         = 14
+previewThemeBtn.Text             = "Preview"
+previewThemeBtn.BorderSizePixel  = 0
+previewThemeBtn.LayoutOrder      = nextOrder(sp)
+Instance.new("UICorner", previewThemeBtn).CornerRadius = UDim.new(0, 6)
+previewThemeBtn.MouseButton1Click:Connect(function()
+	applyTheme(cc)
+	showNotif("Previewing custom theme.", true)
+end)
+
+-- Save / Delete row
+local actionRow = Instance.new("Frame", sp)
+actionRow.Size               = UDim2.new(1, 0, 0, 30)
+actionRow.BackgroundTransparency = 1
+actionRow.LayoutOrder        = nextOrder(sp)
+
+local actionLayout = Instance.new("UIListLayout", actionRow)
+actionLayout.FillDirection       = Enum.FillDirection.Horizontal
+actionLayout.Padding             = UDim.new(0, 8)
+actionLayout.VerticalAlignment   = Enum.VerticalAlignment.Center
+
+local saveBtn = Instance.new("TextButton", actionRow)
+saveBtn.Size             = UDim2.new(0.55, 0, 1, 0)
+saveBtn.BackgroundColor3 = Color3.fromRGB(40, 130, 70)
+saveBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
+saveBtn.Font             = Enum.Font.GothamBold
+saveBtn.TextSize         = 14
+saveBtn.Text             = "Save Theme"
+saveBtn.BorderSizePixel  = 0
+Instance.new("UICorner", saveBtn).CornerRadius = UDim.new(0, 6)
+
+local deleteBtn = Instance.new("TextButton", actionRow)
+deleteBtn.Size             = UDim2.new(0.42, 0, 1, 0)
+deleteBtn.BackgroundColor3 = Color3.fromRGB(160, 45, 45)
+deleteBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
+deleteBtn.Font             = Enum.Font.GothamBold
+deleteBtn.TextSize         = 14
+deleteBtn.Text             = "Delete Theme"
+deleteBtn.BorderSizePixel  = 0
+Instance.new("UICorner", deleteBtn).CornerRadius = UDim.new(0, 6)
+
+local BUILT_IN = {Default=true, ["Green Fallout"]=true, Cyberpunk=true}
+
+saveBtn.MouseButton1Click:Connect(function()
+	local name = themeNameBox.Text
+	if name == "" then showNotif("Enter a theme name first.", false) return end
+	if BUILT_IN[name] then showNotif("Can't overwrite built-in themes.", false) return end
+	themes[name] = {background=cc.background, tabColor=cc.tabColor, textColor=cc.textColor, accent=cc.accent}
+	local found = false
+	for _, n in ipairs(themeOrder) do if n == name then found = true break end end
+	if not found then table.insert(themeOrder, name) end
+	rebuildDropdown()
+	showNotif("\"" .. name .. "\" saved!", true)
+end)
+
+deleteBtn.MouseButton1Click:Connect(function()
+	local name = themeNameBox.Text
+	if name == ""       then showNotif("Enter a theme name to delete.", false) return end
+	if BUILT_IN[name]   then showNotif("Can't delete built-in themes.", false) return end
+	if not themes[name] then showNotif("Theme not found.", false) return end
+	themes[name] = nil
+	for i, n in ipairs(themeOrder) do
+		if n == name then table.remove(themeOrder, i) break end
+	end
+	rebuildDropdown()
+	showNotif("\"" .. name .. "\" deleted.", true)
+end)
+
+-- ────────────────────────────────────────────────────────────
+-- Populate Hubs
+-- ────────────────────────────────────────────────────────────
+addScriptButton(tabPages["Hubs"], "Orca Hub",              "https://raw.githubusercontent.com/richie0866/orca/master/public/latest.lua")
+addScriptButton(tabPages["Hubs"], "KaterHub",              "https://katerhub-inc.github.io/KaterHub/main.lua")
+addScriptButton(tabPages["Hubs"], "FE Trolling GUI",       "https://scriptblox.com/raw/Universal-Script-FE-Trolling-GUI-10739")
+addScriptButton(tabPages["Hubs"], "C00lkid GUI FE Bypass", "https://scriptblox.com/raw/Universal-Script-c00lkidd-gui-FE-BYPASS-28638")
+addScriptButton(tabPages["Hubs"], "Fancy Hub",             "https://sirius.menu/sirius")
+addScriptButton(tabPages["Hubs"], "Universal GUI FE",      "https://pastebin.com/raw/FbuXiswx")
+addCategoryLabel(tabPages["Hubs"], "Universal GUIs")
+addScriptButton(tabPages["Hubs"], "FrkZ Script Hub",        "https://raw.githubusercontent.com/frkfx/Roblox-Script-Hub-Multi-Support/main/Script")
+addScriptButton(tabPages["Hubs"], "Scripthub V3",           "https://raw.githubusercontent.com/scripthubekitten/scripthubv3xeno/refs/heads/main/scripthubv3")
+addScriptButton(tabPages["Hubs"], "Ez Industries Launcher", "https://raw.githubusercontent.com/debug420/Ez-Industries-Launcher-Data/master/Launcher.lua")
+addScriptButton(tabPages["Hubs"], "NTO Admin",              "https://raw.githubusercontent.com/TwomadJR/nto/main/admiin")
+addScriptButton(tabPages["Hubs"], "Wisl FE Script Hub",     "https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/main/Wisl'i%20Universal%20Project.lua")
+addScriptButton(tabPages["Hubs"], "Zacks Easy Hub",         "https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/retrieve_branch_version.lua")
+addScriptButton(tabPages["Hubs"], "Fe Hub.lua",             "https://raw.githubusercontent.com/retpirato/Roblox-Scripts/master/Fe%20Hub.lua")
+
+-- ────────────────────────────────────────────────────────────
+-- Populate Reanimations
+-- ────────────────────────────────────────────────────────────
+addCategoryLabel(tabPages["Reanimations"], "Modern Reanims")
+addScriptButton(tabPages["Reanimations"], "FE Reanim Hub V2",     "https://scriptblox.com/raw/Green-baseplate.-fe-renim-hub-v2-29218")
+addScriptButton(tabPages["Reanimations"], "FE Gale Fighter 2025", "https://www.scriptblox.com/script/Universal-Script-Fe-Gale-Fighter-2025-31487")
+addScriptButton(tabPages["Reanimations"], "Open FE Hub",          "https://raw.githubusercontent.com/Blukezz/Open-FE/main/Main.lua")
+addCategoryLabel(tabPages["Reanimations"], "Anim Packs")
+addScriptButton(tabPages["Reanimations"], "Animation Hub V2.5",            "https://raw.githubusercontent.com/Emerson2-creator/Scripts-Roblox/refs/heads/main/ScriptR6/AnimGuiV2.lua")
+addScriptButton(tabPages["Reanimations"], "Universal Animations & Emotes", "https://github.com/Eazvy/Public-Scripts/raw/main/Universal_Animations_Emotes.lua")
+addScriptButton(tabPages["Reanimations"], "R15 Changer",                   "https://gitlab.com/Tsuniox/lua-stuff/-/raw/master/R15GUI.lua")
+addCategoryLabel(tabPages["Reanimations"], "Legacy Reanims")
+addScriptButton(tabPages["Reanimations"], "Gelatek Reanimate",        "https://raw.githubusercontent.com/Gelatekussy/GelatekReanimate/main/Main.lua")
+addScriptButton(tabPages["Reanimations"], "Motor Angle Reanimate",    "https://www.scriptblox.com/script/Universal-Script-Motor-angle-reanimate-23362")
+addScriptButton(tabPages["Reanimations"], "Custom Reanimate (Basic)", "https://www.scriptblox.com/script/Universal-Script-custom-reanimate-script-24166")
+
+-- ────────────────────────────────────────────────────────────
+-- Populate Parts
+-- ────────────────────────────────────────────────────────────
+addScriptButton(tabPages["Parts"], "Bring Parts to Player", "https://scriptblox.com/raw/Universal-Script-BRING-UNACHORED-PARTS-TO-PLAYERS-SCRIPT-19929")
+addScriptButton(tabPages["Parts"], "Float Aura (Kawaii)",   "https://scriptblox.com/raw/Universal-Script-MAKE-UNANCHORED-PARTS-FLOAT-AROUND-YOU-KAWAII-AURA-23097")
+addScriptButton(tabPages["Parts"], "Wall Walk",             "https://pastebin.com/raw/5T7KsEWy")
+
+-- ────────────────────────────────────────────────────────────
+-- Resize handles
+-- 8 handles: 4 corners + 4 edges
+-- xDir/yDir: +1 grow right/down  -1 grow left/up  0 no change
+-- ────────────────────────────────────────────────────────────
+local HANDLE = 10
+
+local resizeDefs = {
+	--          anchorX anchorY   fixed px   fixed py   scaleW  offW  scaleH  offH   xDir yDir
+	-- Corners
+	{ ax=0, ay=0, px=0,       py=0,       sw=0, ow=HANDLE, sh=0, oh=HANDLE, xd=-1, yd=-1 }, -- NW
+	{ ax=1, ay=0, px=-HANDLE, py=0,       sw=0, ow=HANDLE, sh=0, oh=HANDLE, xd= 1, yd=-1 }, -- NE
+	{ ax=0, ay=1, px=0,       py=-HANDLE, sw=0, ow=HANDLE, sh=0, oh=HANDLE, xd=-1, yd= 1 }, -- SW
+	{ ax=1, ay=1, px=-HANDLE, py=-HANDLE, sw=0, ow=HANDLE, sh=0, oh=HANDLE, xd= 1, yd= 1 }, -- SE
+	-- Edges (one axis spans full width/height)
+	{ ax=0.5, ay=0,   px=0, py=0,       sw=1, ow=0,  sh=0, oh=HANDLE, xd=0, yd=-1 }, -- N
+	{ ax=0.5, ay=1,   px=0, py=-HANDLE, sw=1, ow=0,  sh=0, oh=HANDLE, xd=0, yd= 1 }, -- S
+	{ ax=0,   ay=0.5, px=0, py=0,       sw=0, ow=HANDLE, sh=1, oh=0, xd=-1, yd=0  }, -- W
+	{ ax=1,   ay=0.5, px=-HANDLE, py=0, sw=0, ow=HANDLE, sh=1, oh=0, xd= 1, yd=0  }, -- E
+}
+
+for _, def in ipairs(resizeDefs) do
+	local h = Instance.new("TextButton", mainFrame)
+	h.BackgroundTransparency = 1
+	h.Text                   = ""
+	h.AutoButtonColor        = false
+	h.ZIndex                 = 10
+	h.AnchorPoint            = Vector2.new(def.ax, def.ay)
+	h.Position               = UDim2.new(def.ax, def.px, def.ay, def.py)
+	h.Size                   = UDim2.new(def.sw, def.ow, def.sh, def.oh)
+
+	local resizing   = false
+	local startMouse = Vector2.new()
+	local sW, sH, sX, sY = 0, 0, 0, 0
+
+	h.MouseButton1Down:Connect(function()
+		resizing   = true
+		startMouse = UserInputService:GetMouseLocation()
+		sW, sH, sX, sY = winW, winH, winX, winY
+	end)
+
+	UserInputService.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then resizing = false end
+	end)
+
+	UserInputService.InputChanged:Connect(function(i)
+		if not resizing then return end
+		if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+
+		local m  = UserInputService:GetMouseLocation()
+		local dx = m.X - startMouse.X
+		local dy = m.Y - startMouse.Y
+
+		local nW, nH, nX, nY = sW, sH, sX, sY
+
+		if def.xd == 1 then
+			nW = math.clamp(sW + dx, MIN_W, MAX_W)
+		elseif def.xd == -1 then
+			nW = math.clamp(sW - dx, MIN_W, MAX_W)
+			nX = sX + (sW - nW)
+		end
+
+		if def.yd == 1 then
+			nH = math.clamp(sH + dy, MIN_H, MAX_H)
+		elseif def.yd == -1 then
+			nH = math.clamp(sH - dy, MIN_H, MAX_H)
+			nY = sY + (sH - nH)
+		end
+
+		winW, winH, winX, winY = nW, nH, nX, nY
+		mainFrame.Size     = UDim2.new(0, nW, 0, nH)
+		mainFrame.Position = UDim2.new(0, nX, 0, nY)
+		updateSizeLabel()
+	end)
+end
+
+-- ────────────────────────────────────────────────────────────
+-- Drag (title bar)
+-- ────────────────────────────────────────────────────────────
+local dragging  = false
+local dragStart = Vector2.new()
+local dragOX, dragOY = 0, 0
+
+titleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging  = true
+		dragStart = UserInputService:GetMouseLocation()
+		dragOX, dragOY = winX, winY
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
+
+UserInputService.InputChanged:Connect(function(i)
+	if not dragging then return end
+	if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+	local m = UserInputService:GetMouseLocation()
+	winX = dragOX + (m.X - dragStart.X)
+	winY = dragOY + (m.Y - dragStart.Y)
+	mainFrame.Position = UDim2.new(0, winX, 0, winY)
+end)
+
+-- ────────────────────────────────────────────────────────────
+-- Toggle visibility  (RightShift)
+-- ────────────────────────────────────────────────────────────
+local guiVisible = true
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode ~= TOGGLE_KEY then return end
+	guiVisible = not guiVisible
+	local target = guiVisible and UDim2.new(0, winW, 0, winH) or UDim2.new(0, 0, 0, 0)
+	TweenService:Create(mainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Sine), {Size = target}):Play()
+end)
